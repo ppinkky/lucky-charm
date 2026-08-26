@@ -11,3 +11,11 @@ Use the default canonical labels: `needs-triage`, `needs-info`, `ready-for-agent
 ### Domain docs
 
 This is a single-context repository with root `CONTEXT.md` and `docs/adr/`. See `docs/agents/domain.md`.
+
+### Product requirements
+
+The designer and implementation handoff requirements live in `docs/designer-requirements.md`.
+
+### Taskboard
+
+Track implementation and launch work in `docs/taskboard.md` and its linked GitHub issue.
