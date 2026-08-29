@@ -31,7 +31,7 @@
       .hero-art { background: var(--red); }
       .hero-art:before { border-color: rgba(255,255,255,.35); }
       .sun-stamp { background: #918545; color: var(--cream); }
-      .marquee { background: #9DB2B0; color: var(--ink); }
+      .marquee { background: #E8E3DB; color: #B56821; }
       .inspiration { background: #3A2F23; }
       .inspiration-grid h2, .quote em { color: var(--cream); }
       .inspiration-grid h2 em, .quote { color: #CDA9A2; }
@@ -45,8 +45,8 @@
       .site-header { color: #1D1D1D; mix-blend-mode: normal; }
       .site-header .wordmark span, .site-header nav a:hover { color: #C86C35; }
       .site-header .header-link { border-color: #1D1D1D; }
-      .hero { align-items: flex-end; background-color: #F3F1EC; background-image: url('asset/Group 9.png'); background-position: center; background-repeat: no-repeat; background-size: auto 100%; color: #1D1D1D; display:flex; min-height: 600px; overflow: hidden; padding: 84px 8vw 72px; position: relative; }
-      .hero:before { background: linear-gradient(90deg, #F3F1EC 0%, #F3F1EC 32%, rgba(243,241,236,.72) 52%, rgba(243,241,236,0) 80%); content: ''; inset: 0; pointer-events: none; position: absolute; z-index: 0; }
+      .hero { align-items: flex-end; background-color: #F3F1EC; background-image: url('asset/Group 9.png'); background-position: center bottom; background-repeat: no-repeat; background-size: 100% auto; color: #1D1D1D; display:flex; min-height: 400px; overflow: hidden; padding: 84px 8vw 72px; position: relative; }
+      .hero:before { }
       .hero-copy { align-self: flex-end; max-width: 520px; min-width: 0; padding-bottom: 0; position: relative; z-index: 1; }
       .hero h1, .hero-intro, .opening-copy p { overflow-wrap: break-word; }
       .hero .eyebrow { color: #C86C35; }
@@ -59,9 +59,9 @@
       .button-dark { background: #1D1D1D; color: #F5F2EC; }
       .hero-art { display: none; }
       .hero-note { bottom: 8%; color: #1D1D1D; font-family: var(--sans); font-size: 13px; font-weight: 700; left: auto; line-height: 1.15; right: 8%; text-transform: uppercase; width: 170px; }
-      .marquee { background: #1D1D1D; color: #F5F2EC; font-family: var(--mono); font-size: 14px; letter-spacing: .12em; text-transform: uppercase; }
+      .marquee {background: #E8E3DB; color: #B56821; font-family: var(--mono); font-size: 14px; font-weight: 800;letter-spacing: .12em; text-transform: uppercase; }
       .marquee span { color: #C86C35; font-size: 18px; }
-      .section { padding: 105px 8vw; }
+      .section { padding: px 8vw; }
       .section-kicker { font-size: 10px; letter-spacing: .2em; }
       .story { background: #F3F1EC; }
       .story-grid, .inspiration-grid, .visit-grid { gap: 8vw; padding-top: 78px; }
@@ -102,10 +102,10 @@
       .inspiration-ending > p:last-child { grid-column: 2; }
       @media (max-width: 700px) {
         .site-header { height: 60px; padding: 0 6vw; }
-        .header-logo img { height: 26px; width: auto; }
+        .header-logo img { height: 40px; width: auto; }
         .footer-logo img { width: 120px; }
-        .hero { align-items: flex-start; background-position: center; background-size: cover; min-height: 600px; overflow: hidden; padding: 76px 6vw 54px; }
-        .hero:before { background: linear-gradient(180deg, rgba(243,241,236,.95) 0%, rgba(243,241,236,.82) 42%, rgba(243,241,236,.35) 78%, rgba(243,241,236,.12) 100%); }
+        .hero { align-items: flex-start; background-position: center; background-size: cover; min-height: 400px; overflow: hidden; padding: 76px 6vw 54px; }
+        /* .hero:before { background: linear-gradient(180deg, rgba(243,241,236,.95) 0%, rgba(243,241,236,.82) 42%, rgba(243,241,236,.35) 78%, rgba(243,241,236,.12) 100%); } */
         .hero-copy { align-self: flex-start; max-width: 100%; position: relative; }
         .hero h1 { font-size: clamp(32px, 10vw, 46px); line-height: .98; }
         .hero-intro { font-size: 15px; max-width: 100%; }
@@ -123,7 +123,7 @@
   </head>
   <body>
     <header class="site-header">
-      <a class="header-logo" href="#top" aria-label="CHARM home"><img src="asset/logo1.png" alt="CHARM" /></a>
+      <a class="header-logo" href="#top" aria-label="CHARM home"><img src="asset/logo1.svg" alt="CHARM" /></a>
     </header>
 
     <main id="top">
@@ -131,12 +131,12 @@
         <div class="hero-copy reveal">
           <h1 id="hero-title"><span>FOOD LUCK</span><br /><span>PROSPERITY</span></h1>
           <div class="hero-intro opening-copy">
-            <p class="opening-close">One holds the food.<br />The other holds the fortune.<br /><strong>Charm holds both.</strong></p>
+            <!-- <p class="opening-close">One holds the food.<br />The other holds the fortune.<br /><strong>Charm holds both.</strong></p> -->
             <p>An interactive dining ritual inspired by Thai fortune telling, bringing together <strong>food, art, technology, and play</strong> around the table.</p>
           </div>
           
-          <a class="button button-dark" href="#story">Discover Charm <span aria-hidden="true">↘</span></a>
-        <p>Try your luck at Sala Thai, During Tom Yum Week</p>
+          <!-- <a class="button button-dark" href="#story">Discover Charm <span aria-hidden="true">↘</span></a> -->
+        <p>Try your luck at <strong>Sala Thai</strong>, During <strong>Tom Yum Week!</strong></p>
         </div>
 
       </section>
