@@ -20,7 +20,7 @@
 
 * { box-sizing: border-box; }
 html, body { max-width: 100%; overflow-x: hidden; }
-html { scroll-behavior: smooth; }
+/* smooth scrolling is handled by Lenis (see index.html); keep native scroll-behavior off */
 body {
   margin: 0;
   background: var(--paper);
@@ -298,7 +298,6 @@ h2 em { font-style: italic; color: var(--terracotta); }
 @media (prefers-reduced-motion: reduce) {
   .reveal { animation: none; }
   .marquee div { animation: none; }
-  html { scroll-behavior: auto; }
 }
 
 /* ---------- responsive ---------- */

@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://unpkg.com/lenis@1.3.26/dist/lenis.css" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -65,5 +66,24 @@
       <p>Made by Pinky Arunwattanamongkol and Fai Chittayasodhara<br />with Tom Yum Lab</p>
       <p>NYC · CIN · 2026</p>
     </footer>
+
+    <script src="https://unpkg.com/lenis@1.3.26/dist/lenis.min.js"></script>
+    <script>
+      if (window.Lenis && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const lenis = new Lenis({ autoRaf: true });
+
+        // Animate same-page anchor links (e.g. the logo → #top)
+        document.querySelectorAll('a[href^="#"]').forEach((link) => {
+          link.addEventListener('click', (event) => {
+            const hash = link.getAttribute('href');
+            const target = hash.length > 1 ? document.querySelector(hash) : null;
+            if (hash === '#' || target) {
+              event.preventDefault();
+              lenis.scrollTo(target || 0);
+            }
+          });
+        });
+      }
+    </script>
   </body>
 </html>
