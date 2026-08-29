@@ -37,11 +37,12 @@ p, h1, h2, h3 { margin: 0; }
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 60px;
-  padding: 0 8vw;
+  /*height: 0px;*/
+
+  padding: 24px 8vw;
   background: var(--panel);
 }
-.header-logo img { height: ; width: auto; }
+.header-logo img { height: 50px ; width: auto; }
 
 /* ---------- hero ---------- */
 .hero {
@@ -51,7 +52,7 @@ p, h1, h2, h3 { margin: 0; }
   min-height: 560px;
   overflow: hidden;
   padding: 84px 8vw 72px;
-  background: var(--paper) url('asset/Group 9.png') center bottom / auto no-repeat;
+  background: var(--paper) url('asset/Group 9.png') center bottom / cover no-repeat;
   color: var(--ink);
 }
 /* Paper scrim over the photo: heavy under the text column, clearing to the right
@@ -202,7 +203,7 @@ h2 em { font-style: italic; color: var(--terracotta); }
 
 /* ---------- inspiration ---------- */
 .inspiration { background: var(--brown); color: var(--cream); }
-.inspiration-story { align-items: start; padding-bottom: 70px; }
+.inspiration-story { grid-template-columns: 1fr; gap: 36px; justify-items: center; text-align: center; padding-bottom: 70px; }
 .inspiration-story .eyebrow { color: var(--rose); }
 .inspiration-grid h2 { color: var(--cream); }
 .inspiration-grid h2 em { color: var(--rose); }
@@ -210,14 +211,15 @@ h2 em { font-style: italic; color: var(--terracotta); }
 .inspiration-copy p + p { margin-top: 24px; }
 .inspiration-ending {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px 8vw;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  justify-items: center;
+  text-align: center;
   border-top: 1px solid rgba(245, 242, 236, .35);
   padding-top: 28px;
 }
-.inspiration-ending > p { font-size: 19px; line-height: 1.35; }
+.inspiration-ending > p { max-width: 560px; font-size: 19px; line-height: 1.35; }
 .inspiration-ending > p:nth-child(2) { color: var(--rose); font-weight: 700; }
-.inspiration-ending > p:last-child { grid-column: 2; }
 .quote-lines {
   font-weight: 700;
   font-size: clamp(24px, 3vw, 42px);
