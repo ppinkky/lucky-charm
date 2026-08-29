@@ -5,121 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="CHARM / ชาม is an interactive dining ritual exploring the relationship between food, luck, and prosperity." />
     <title>CHARM / ชาม — Food, luck, and prosperity</title>
-    <style>
-      .opening-copy p + p { margin-top: 16px; }
-      .hero h1 strong { font-weight: 600; }
-      .opening-close { color: var(--red); font-family: var(--serif); font-size: 21px; line-height: 1.2; }
-      .opening-close strong { color: var(--ink); }
-    </style>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
-    <style>
-      :root {
-        --ink: #1D1D1D;
-        --paper: #F3F1EC;
-        --cream: #F5F2EC;
-        --red: #C86C35;
-        --yellow: #918545;
-        --blue: #9DB2B0;
-        --serif: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-        --sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-      }
-      .hero h1, h2 { font-family: var(--serif); font-weight: 700; letter-spacing: -0.01em; }
-      .hero h1 em, h2 em { color: var(--red); }
-      .hero-art { background: var(--red); }
-      .hero-art:before { border-color: rgba(255,255,255,.35); }
-      .sun-stamp { background: #918545; color: var(--cream); }
-      .marquee { background: #E8E3DB; color: #B56821; }
-      .inspiration { background: #3A2F23; }
-      .inspiration-grid h2, .quote em { color: var(--cream); }
-      .inspiration-grid h2 em, .quote { color: #CDA9A2; }
-      .visit { background: #9DB2B0; }
-      .button-light { background: #918545; color: var(--cream); }
-    </style>
-    <style>
-      /* Brand-led landing treatment */
-      html, body { max-width: 100%; overflow-x: hidden; }
-      body { background: #F3F1EC; color: #1D1D1D; }
-      .site-header { color: #1D1D1D; mix-blend-mode: normal; }
-      .site-header .wordmark span, .site-header nav a:hover { color: #C86C35; }
-      .site-header .header-link { border-color: #1D1D1D; }
-      .hero { align-items: flex-end; background-color: #F3F1EC; background-image: url('asset/Group 9.png'); background-position: center bottom; background-repeat: no-repeat; background-size: 100% auto; color: #1D1D1D; display:flex; min-height: 400px; overflow: hidden; padding: 84px 8vw 72px; position: relative; }
-      .hero:before { }
-      .hero-copy { align-self: flex-end; max-width: 520px; min-width: 0; padding-bottom: 0; position: relative; z-index: 1; }
-      .hero h1, .hero-intro, .opening-copy p { overflow-wrap: break-word; }
-      .hero .eyebrow { color: #C86C35; }
-      .hero h1 { color: #2B2727; font-family: Helvetica, Arial, sans-serif; font-size: clamp(52px, 8vw, 104px); font-weight: 700; line-height: .9; letter-spacing: -.01em; margin: 0; }
-      .hero h1 span { color: #2B2727; display: inline-block; font-weight: 700; }
-      .hero-intro { font-size: 16px; line-height: 1.45; max-width: 420px; padding: 26px 0 26px; }
-      .opening-copy p + p { margin-top: 14px; }
-      .opening-close { color: #1D1D1D; font-family: var(--sans); font-size: 14px; letter-spacing: .02em; line-height: 1.5; text-transform: uppercase; }
-      .opening-close strong { color: #1D1D1D; }
-      .button-dark { background: #1D1D1D; color: #F5F2EC; }
-      .hero-art { display: none; }
-      .hero-note { bottom: 8%; color: #1D1D1D; font-family: var(--sans); font-size: 13px; font-weight: 700; left: auto; line-height: 1.15; right: 8%; text-transform: uppercase; width: 170px; }
-      .marquee {background: #E8E3DB; color: #B56821; font-family: var(--mono); font-size: 14px; font-weight: 800;letter-spacing: .12em; text-transform: uppercase; }
-      .marquee span { color: #C86C35; font-size: 18px; }
-      .section { padding: px 8vw; }
-      .section-kicker { font-size: 10px; letter-spacing: .2em; }
-      .story { background: #F3F1EC; }
-      .story-grid, .inspiration-grid, .visit-grid { gap: 8vw; padding-top: 78px; }
-      .section-heading h2, .artists-intro h2, .visit h2 { font-size: clamp(52px, 7vw, 100px); letter-spacing: -.06em; }
-      .story-body, .inspiration-grid p, .artists-intro p, .visit-copy { font-family: var(--sans); font-size: 17px; line-height: 1.45; }
-      .story-images { gap: 0; }
-      .image-tile { border: 1px solid #1D1D1D; min-height: 260px; }
-      .illustration-placeholder { align-items: center; background: #DFD8CC; justify-content: center; }
-      .illustration-placeholder:after { border: 1px dashed rgba(43,39,39,.45); content: ''; inset: 14px; position: absolute; }
-      .illustration-placeholder span { color: #2B2727; font-weight: 700; letter-spacing: .12em; text-align: center; z-index: 1; }
-      .inspiration { background: #3A2F23; }
-      .inspiration-grid h2 { color: #F5F2EC; }
-      .inspiration-grid h2 em, .quote em { color: #CDA9A2; }
-      .quote { color: #F5F2EC; }
-      .artists { background: #DCD8CF; }
-      .artist-list { gap: 18px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .artist-list article { border-left: 1px solid #1D1D1D; padding-left: 18px; }
-      .artist-list article:first-child { border-left: 0; padding-left: 0; }
-      .artist-image { aspect-ratio: 1 / 1; filter: saturate(.8); }
-      .artist-meta h3 { font-family: var(--sans); font-size: 18px; font-weight: 700; text-transform: uppercase; }
-      .visit { background: #9DB2B0; }
-      .map-card { background: #F3F1EC; border: 1px solid #1D1D1D; }
-      .button-light { background: #918545; }
-      .site-footer { background: #1D1D1D; }
-      .footer-logo img { display: block; height: auto; width: 148px; }
-      .site-header { align-items: center; background: #DFD8CC; display: flex; height: 60px; justify-content: center; padding: 0 8vw; position: relative; }
-      .site-header nav { margin-left: 0; margin-right: 0; }
-      .header-logo { left: auto; position: static; top: auto; transform: none; }
-      .header-logo img { display: block; height: 32px; width: auto; }
-      .inspiration-story { align-items: start; padding-bottom: 70px; }
-      .inspiration-story .eyebrow { color: #CDA9A2; }
-      .inspiration-copy { max-width: 560px; }
-      .inspiration-copy p + p { margin-top: 24px; }
-      .inspiration-ending { border-top: 1px solid rgba(245,242,236,.35); display: grid; grid-template-columns: 1fr 1fr; gap: 24px 8vw; padding-top: 28px; }
-      .inspiration-ending > p { font-family: var(--sans); font-size: 19px; line-height: 1.35; }
-      .inspiration-ending > p:nth-child(2) { color: #CDA9A2; font-weight: 700; }
-      .quote-lines { color: #F5F2EC; font-family: var(--sans); font-size: clamp(24px, 3vw, 42px); font-weight: 700; line-height: 1.08; }
-      .inspiration-ending > p:last-child { grid-column: 2; }
-      @media (max-width: 700px) {
-        .site-header { height: 60px; padding: 0 6vw; }
-        .header-logo img { height: 40px; width: auto; }
-        .footer-logo img { width: 120px; }
-        .hero { align-items: flex-start; background-position: center; background-size: cover; min-height: 400px; overflow: hidden; padding: 76px 6vw 54px; }
-        /* .hero:before { background: linear-gradient(180deg, rgba(243,241,236,.95) 0%, rgba(243,241,236,.82) 42%, rgba(243,241,236,.35) 78%, rgba(243,241,236,.12) 100%); } */
-        .hero-copy { align-self: flex-start; max-width: 100%; position: relative; }
-        .hero h1 { font-size: clamp(32px, 10vw, 46px); line-height: .98; }
-        .hero-intro { font-size: 15px; max-width: 100%; }
-        .hero-note { bottom: 8%; left: 6%; right: auto; width: 140px; }
-        .section { padding: 75px 6vw; }
-        .story-grid, .inspiration-grid, .visit-grid { padding-top: 58px; }
-        .inspiration-ending { display: block; }
-        .inspiration-ending > p, .quote-lines { margin-top: 28px; }
-        .inspiration-ending > p:first-child { margin-top: 0; }
-        .artist-list { grid-template-columns: 1fr; }
-        .artist-list article { border-left: 0; padding-left: 0; }
-        .artist-list article:last-child { display: block; }
-      }
-    </style>
   </head>
   <body>
     <header class="site-header">
@@ -130,15 +19,11 @@
       <section class="hero" aria-labelledby="hero-title">
         <div class="hero-copy reveal">
           <h1 id="hero-title"><span>FOOD LUCK</span><br /><span>PROSPERITY</span></h1>
-          <div class="hero-intro opening-copy">
-            <!-- <p class="opening-close">One holds the food.<br />The other holds the fortune.<br /><strong>Charm holds both.</strong></p> -->
+          <div class="hero-intro">
             <p>An interactive dining ritual inspired by Thai fortune telling, bringing together <strong>food, art, technology, and play</strong> around the table.</p>
           </div>
-          
-          <!-- <a class="button button-dark" href="#story">Discover Charm <span aria-hidden="true">↘</span></a> -->
-        <p>Try your luck at <strong>Sala Thai</strong>, During <strong>Tom Yum Week!</strong></p>
+          <p class="hero-tagline">Try your luck at <strong>Sala Thai</strong> during <strong>Tom Yum Week</strong></p>
         </div>
-
       </section>
 
       <section class="marquee" aria-label="Lucky Charm themes"><div>FOOD <span>×</span> ART <span>×</span> TECHNOLOGY <span>×</span> CULTURE <span>×</span> PLAY <span>×</span> FOOD <span>×</span> ART <span>×</span> TECHNOLOGY <span>×</span> CULTURE <span>×</span> PLAY <span>×</span></div></section>
@@ -148,7 +33,11 @@
           <div class="section-heading"><p class="eyebrow">What is Charm?</p><h2>Two meanings.<br /><em>One ritual.</em></h2></div>
           <div class="story-body"><p><strong>ชาม (chaam)</strong> means <em>bowl</em> in Thai. In English, a <strong>charm</strong> can be an object associated with luck.</p><p>Charm brings these two meanings together through a contemporary dining ritual exploring our relationship with <strong>food, luck, and prosperity.</strong></p><p>Guests draw a fortune, discover what luck has in store, and share the experience with the people around them.</p></div>
         </div>
-        <div class="story-images"><div class="image-tile image-tile-food illustration-placeholder" aria-label="Illustration placeholder 1"><span>ILLUSTRATION 01<br />COMING SOON</span></div><div class="image-tile image-tile-hands illustration-placeholder" aria-label="Illustration placeholder 2"><span>ILLUSTRATION 02<br />COMING SOON</span></div><div class="image-tile image-tile-paper illustration-placeholder" aria-label="Illustration placeholder 3"><span>ILLUSTRATION 03<br />COMING SOON</span></div></div>
+        <div class="story-images">
+          <div class="image-tile image-tile-food"><span>ILLUSTRATION 01<br />COMING SOON</span></div>
+          <div class="image-tile image-tile-hands"><span>ILLUSTRATION 02<br />COMING SOON</span></div>
+          <div class="image-tile image-tile-paper"><span>ILLUSTRATION 03<br />COMING SOON</span></div>
+        </div>
       </section>
 
       <section class="inspiration section" id="inspiration">
@@ -169,10 +58,12 @@
         <div class="artists-intro"><h2>Made by two<br /><em>hands.</em></h2><p>A collaboration between two artists and the people who keep a table warm. Artist names and portraits will be added here as the program is announced.</p></div>
         <div class="artist-list"><article><div class="artist-image portrait-one"></div><div class="artist-meta"><span>Visual direction</span><h3>Artist name</h3><p>Coming soon</p></div></article><article><div class="artist-image portrait-two"></div><div class="artist-meta"><span>Fortune writing</span><h3>Artist name</h3><p>Coming soon</p></div></article></div>
       </section>
-
     </main>
 
-    <footer class="site-footer"><a class="footer-logo" href="#top" aria-label="CHARM home"><img src="asset/Group 5.svg" alt="CHARM" /></a><p>Made by Pinky Arunwattanamongkol and Fai Chittayasodhara
-With Tom Yum Lab</p><p>NYC · CIN · 2026</p></footer>
+    <footer class="site-footer">
+      <a class="footer-logo" href="#top" aria-label="CHARM home"><img src="asset/Group 5.svg" alt="CHARM" /></a>
+      <p>Made by Pinky Arunwattanamongkol and Fai Chittayasodhara<br />with Tom Yum Lab</p>
+      <p>NYC · CIN · 2026</p>
+    </footer>
   </body>
 </html>
