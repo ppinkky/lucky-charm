@@ -18,12 +18,12 @@
 
     <main id="top">
       <section class="hero" aria-labelledby="hero-title">
-        <div class="hero-copy reveal">
+        <div class="hero-copy">
           <h1 id="hero-title"><span>FOOD LUCK</span><br /><span>PROSPERITY</span></h1>
           <div class="hero-intro">
             <p>An interactive dining ritual inspired by Thai fortune telling, bringing together <strong>food, art, technology, and play</strong> around the table.</p>
           </div>
-          <p class="hero-tagline">Try your luck at <strong>Sala Thai</strong> during <strong>Tom Yum Week 2026
+          <p class="hero-tagline">Try your luck at <strong>Sala Thai</strong> during <strong>Tom Yum Week 2026!
           </strong></p>
         </div>
       </section>
@@ -41,13 +41,13 @@
         </div>
 
         <figure class="ritual-demo">
-          <img src="asset/card shaking-wireframe.gif" alt="The Charm app on a phone: a fortune card with the prompt “Shake to reveal.”" />
+          <img class="shake-gif" src="asset/card shaking-wireframe-poster.png" data-gif="asset/card shaking-wireframe.gif" alt="The Charm app on a phone: a fortune card with the prompt “Shake to reveal.” Tap to play." />
         </figure>
       </section>
 
       <section class="illustrations section" id="illustrations">
         <div class="illustration-row">
-          <img src="asset/food/padthai.svg" alt="Pad thai" />
+          <img src="asset/food/padthai 2.svg" alt="Pad thai" />
           <img src="asset/logo5.svg" alt="Charm" />
           <img src="asset/food/chicken.svg" alt="Chicken" />
         </div>
@@ -95,6 +95,35 @@
               lenis.scrollTo(target || 0);
             }
           });
+        });
+      }
+
+      // Tap the shake card to play it: 3 loops, then freeze on the first frame.
+      const shakeGif = document.querySelector('.shake-gif');
+      if (shakeGif) {
+        const animated = shakeGif.dataset.gif;
+        const poster = shakeGif.getAttribute('src');
+        const LOOP_MS = 2940; // one loop of the GIF (42 frames × 70ms)
+        const PLAYS = 3;
+        let running = false;
+        shakeGif.style.cursor = 'pointer';
+        shakeGif.setAttribute('role', 'button');
+        shakeGif.setAttribute('tabindex', '0');
+        const play = () => {
+          if (running) return;
+          running = true;
+          shakeGif.src = animated; // reassigning src restarts GIF playback from frame 1
+          window.setTimeout(() => {
+            shakeGif.src = poster; // stop after 3 loops
+            running = false;
+          }, LOOP_MS * PLAYS);
+        };
+        shakeGif.addEventListener('click', play);
+        shakeGif.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            play();
+          }
         });
       }
     </script>
