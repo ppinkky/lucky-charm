@@ -227,15 +227,15 @@ h2 em { font-style: italic; color: var(--terracotta); }
 .artists { background: var(--panel-2); }
 .artists-intro {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8vw;
+  gap: 12px;
   align-items: end;
-  padding-top: 78px;
+  padding-top: 24px;
 }
 .artist-list {
   display: flex;
+  gap: 24px; 
   flex-wrap: wrap;
-  gap: 36px 64px;
+  justify-content: left;
   padding-top: 48px;
 }
 .artist-list article { display: flex; align-items: center; gap: 16px; }
@@ -258,6 +258,11 @@ h2 em { font-style: italic; color: var(--terracotta); }
   text-transform: uppercase;
   color: var(--ink);
 }
+.artists-intro h2 {
+  font-size: clamp(22px, 2.6vw, 32px);
+  margin-bottom: 0;
+}
+
 .artist-meta h3 {
   margin-top: 8px;
   font-size: 18px;
