@@ -244,11 +244,13 @@ h2 em { font-style: italic; color: var(--terracotta); }
   width: 84px;
   height: 84px;
   aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  background-position: center;
   background-size: cover;
   filter: saturate(.85);
 }
-.portrait-one { background: linear-gradient(145deg, #B4462C 10%, #C98A3F 10% 42%, #2E3B2C 42% 75%, #DDE0D6 75%); }
-.portrait-two { background: linear-gradient(40deg, #2E5A50, #E0A88F 38%, #B4462C 39% 64%, #CE9A44 65%); }
+.portrait-one { background-image: url('asset/pinky.jpg'); }
+.portrait-two { background-image: url('asset/fai.jpg'); }
 .artist-meta { padding-top: 0; }
 .artist-meta span {
   display: block;
