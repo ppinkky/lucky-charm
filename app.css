@@ -675,6 +675,31 @@ button {
     transform: scale(1.04);
   }
 }
+/* light burst when the bowl cracks — the visual payoff on devices with no haptic */
+.shake-body.is-cracking::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at 50% 46%,
+    rgba(255, 247, 236, 0.96),
+    rgba(255, 243, 228, 0) 62%
+  );
+  animation: crack-flash 0.62s ease-out forwards;
+}
+@keyframes crack-flash {
+  0% {
+    opacity: 0;
+  }
+  22% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
 
 /* ---------- 5 · result ---------- */
 .screen--result {

@@ -23,12 +23,44 @@
   var shakeEnergy = 0; // accumulates while the phone is being shaken, then decays
   var SHAKE_TRIGGER = 60; // energy needed to break the bowl open
 
-  /* Haptics — navigator.vibrate is Android/Chrome only; iOS Safari has no web haptic
-     API, so this is a progressive enhancement and silently no-ops elsewhere. */
+  var IS_IOS =
+    /iP(hone|ad|od)/.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+  /* Haptics.
+     - Android / Chrome: navigator.vibrate — real vibration.
+     - iOS Safari: no vibration API exists at all. Best effort only: toggling a
+       hidden <input type="checkbox" switch> plays the system toggle haptic on
+       iOS 17.4+. It may do nothing on older iOS — there is no other web hook. */
+  var iosHapticToggle = null;
+  if (IS_IOS && document.body) {
+    try {
+      var wrap = document.createElement('span');
+      wrap.setAttribute('aria-hidden', 'true');
+      wrap.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden;opacity:0;pointer-events:none';
+      iosHapticToggle = document.createElement('input');
+      iosHapticToggle.type = 'checkbox';
+      iosHapticToggle.setAttribute('switch', '');
+      iosHapticToggle.tabIndex = -1;
+      wrap.appendChild(iosHapticToggle);
+      document.body.appendChild(wrap);
+    } catch (e) {
+      iosHapticToggle = null;
+    }
+  }
+
   function haptic(pattern) {
     if (navigator.vibrate) {
       try {
         navigator.vibrate(pattern);
+        return;
+      } catch (e) {
+        /* fall through */
+      }
+    }
+    if (iosHapticToggle) {
+      try {
+        iosHapticToggle.click();
       } catch (e) {
         /* ignore */
       }
@@ -192,6 +224,7 @@
   function goToResult() {
     renderResult(drawn);
     show('result');
+    prepareShareImage(); // render the shareable PNG now so Share can fire in-gesture
     haptic(24); // a soft settle as the slip lands
     announce('Your fortune is ready. Number ' + drawn.id + ', ' + drawn.title + '.');
     busy = false;
@@ -207,6 +240,7 @@
   function beginReveal() {
     if (busy) return;
     busy = true;
+    haptic(18); // primes the vibrate motor and confirms the tap (Android)
     requestMotionPermission(); // must run inside this user gesture (iOS)
 
     loadFortunes()
@@ -235,22 +269,35 @@
     if (busy || current !== 'shake' || !drawn) return;
     busy = true;
     motionArmed = false;
-    resetCharge();
-    haptic([0, 35, 45, 70]); // the bowl cracks open
+    haptic([0, 35, 45, 70]); // the bowl cracks open (Android)
     announce('The bowl is shaking.');
 
     var card = screens.shake.querySelector('.fortune-container');
+    var body = screens.shake.querySelector('.shake-body');
     if (REDUCED || !card) {
+      resetCharge();
       goToResult();
       return;
     }
-    card.classList.add('is-shaking');
+
+    // full-energy bloom, then a light flash — the visual "crack" (matters on iOS,
+    // which has no haptic to sell the moment)
+    card.style.setProperty('--charge', '1');
+    card.classList.add('is-charging');
+    if (body) body.classList.add('is-cracking');
+
+    window.setTimeout(function () {
+      card.classList.remove('is-charging');
+      card.classList.add('is-shaking');
+    }, 130);
     window.setTimeout(function () {
       card.classList.remove('is-shaking');
       card.classList.add('is-opening');
     }, SHAKE_ANIM_MS - 300);
     window.setTimeout(function () {
       card.classList.remove('is-opening');
+      if (body) body.classList.remove('is-cracking');
+      resetCharge();
       goToResult();
     }, SHAKE_ANIM_MS);
   }
@@ -258,6 +305,8 @@
   function tryAgain() {
     drawn = null;
     busy = false;
+    sharePrep = null;
+    sharePrepPromise = null;
     resetCharge();
     var card = screens.shake.querySelector('.fortune-container');
     if (card) card.classList.remove('is-shaking', 'is-opening');
@@ -266,10 +315,6 @@
   }
 
   /* ---------- share / save the fortune slip as an image ---------- */
-  var IS_IOS =
-    /iP(hone|ad|od)/.test(navigator.userAgent) ||
-    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-
   function fileName() {
     return 'charm-fortune-' + pad2(drawn.id) + '.png';
   }
@@ -277,21 +322,38 @@
     return 'My fortune from CHARM at Sala Thai — ' + drawn.title + '. Food, luck, prosperity.';
   }
 
+  // Load an image for canvas use. SVGs are fetched and handed to the Image as a
+  // data: URI — that keeps the canvas untainted (Safari taints canvases that draw
+  // an SVG loaded by URL), so toBlob()/toDataURL() keep working for sharing.
   function loadImage(src) {
-    return new Promise(function (resolve) {
-      if (!src) {
-        resolve(null);
-        return;
-      }
-      var img = new Image();
-      img.onload = function () {
-        resolve(img);
-      };
-      img.onerror = function () {
-        resolve(null);
-      };
-      img.src = src;
-    });
+    if (!src) return Promise.resolve(null);
+
+    function fromUri(uri) {
+      return new Promise(function (resolve) {
+        var img = new Image();
+        img.onload = function () {
+          resolve(img);
+        };
+        img.onerror = function () {
+          resolve(null);
+        };
+        img.src = uri;
+      });
+    }
+
+    if (/\.svg(\?|$)/i.test(src)) {
+      return fetch(src)
+        .then(function (r) {
+          return r.ok ? r.text() : Promise.reject(new Error('svg ' + r.status));
+        })
+        .then(function (txt) {
+          return fromUri('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(txt));
+        })
+        .catch(function () {
+          return null;
+        });
+    }
+    return fromUri(src);
   }
 
   /* Purpose-built 1080×1920 portrait — sized for an Instagram story, styled like
@@ -520,6 +582,27 @@
     return buildShareCanvas(drawn).then(canvasToBlob);
   }
 
+  /* The image is rendered the moment the result screen appears and cached, so the
+     Share tap can call navigator.share() synchronously — iOS Safari rejects a
+     share that isn't fired directly from the user gesture. */
+  var sharePrep = null; // { blob, file }
+  var sharePrepPromise = null;
+  function prepareShareImage() {
+    sharePrep = null;
+    sharePrepPromise = fortuneImage()
+      .then(function (blob) {
+        sharePrep = blob
+          ? { blob: blob, file: new File([blob], fileName(), { type: 'image/png' }) }
+          : null;
+        return sharePrep;
+      })
+      .catch(function () {
+        sharePrep = null;
+        return null;
+      });
+    return sharePrepPromise;
+  }
+
   function openOrDownload(blob) {
     var url = URL.createObjectURL(blob);
     if (IS_IOS) {
@@ -548,51 +631,63 @@
     }
   }
 
+  function canShareFile(file) {
+    return !!(navigator.canShare && file && navigator.canShare({ files: [file] }));
+  }
+
   function shareFortune() {
     if (!drawn) return;
+    haptic(12);
+
+    // Fast path: image is ready → share it right now, inside this tap.
+    if (sharePrep && canShareFile(sharePrep.file)) {
+      navigator
+        .share({ files: [sharePrep.file], text: shareText() })
+        .then(function () {
+          announce('Shared.');
+        })
+        .catch(function (err) {
+          if (err && err.name === 'AbortError') return;
+          openOrDownload(sharePrep.blob); // share sheet failed → hand over the file
+        });
+      return;
+    }
+    if (sharePrep) {
+      // This browser can't share files (most desktops) — download the image instead.
+      openOrDownload(sharePrep.blob);
+      return;
+    }
+
+    // Image still rendering (rare — it starts on result screen load). Wait, then
+    // save it; the gesture is spent so we can't open the share sheet this round.
     var btn = document.querySelector('[data-action="share"]');
     if (btn) btn.classList.add('is-busy');
     announce('Preparing your fortune image…');
-
-    fortuneImage()
-      .then(function (blob) {
-        if (btn) btn.classList.remove('is-busy');
-        if (!blob) {
-          copyFallback();
-          return;
-        }
-        var file = new File([blob], fileName(), { type: 'image/png' });
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          navigator
-            .share({ files: [file], title: 'My CHARM fortune', text: shareText() })
-            .catch(function () {});
-        } else if (navigator.share) {
-          navigator
-            .share({ title: 'My CHARM fortune', text: shareText(), url: window.location.href })
-            .catch(function () {});
-        } else {
-          openOrDownload(blob); // desktop — no Web Share
-        }
-      })
-      .catch(function (err) {
-        if (btn) btn.classList.remove('is-busy');
-        console.error('[charm] share image failed:', err);
+    (sharePrepPromise || prepareShareImage()).then(function () {
+      if (btn) btn.classList.remove('is-busy');
+      if (sharePrep && canShareFile(sharePrep.file)) {
+        openOrDownload(sharePrep.blob);
+        announce('Image ready and saved — tap Share again to post it to a story.');
+      } else if (sharePrep) {
+        openOrDownload(sharePrep.blob);
+      } else {
         copyFallback();
-      });
+      }
+    });
   }
 
   function saveImage() {
     if (!drawn) return;
-    announce('Saving your fortune image…');
-    fortuneImage()
-      .then(function (blob) {
-        if (blob) openOrDownload(blob);
-        else copyFallback();
-      })
-      .catch(function (err) {
-        console.error('[charm] save image failed:', err);
-        copyFallback();
-      });
+    haptic(12);
+    if (sharePrep) {
+      openOrDownload(sharePrep.blob);
+      return;
+    }
+    announce('Preparing your fortune image…');
+    (sharePrepPromise || prepareShareImage()).then(function () {
+      if (sharePrep) openOrDownload(sharePrep.blob);
+      else copyFallback();
+    });
   }
 
   /* ---------- device shake ---------- */
@@ -715,6 +810,7 @@
     var fn = actions[el.dataset.action];
     if (fn) {
       e.preventDefault();
+      if (el.dataset.action !== 'reveal-fortune') haptic(10); // taps get a tick (Android)
       fn();
     }
   });
