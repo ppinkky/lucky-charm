@@ -85,13 +85,21 @@
       <!-- 4 — Shake to reveal -->
       <section class="screen screen--shake" id="screen-shake" data-screen="shake" aria-label="Shake to reveal" hidden>
         <div class="shake-body">
+          <span class="shake-aura" aria-hidden="true"></span>
+          <span class="shake-sparks" aria-hidden="true">
+            <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+          </span>
+
           <div class="shake-head">
             <span class="ornament" aria-hidden="true"><i class="ornament-rule"></i>&#10022;<i class="ornament-rule"></i></span>
             <h1 class="screen-title screen-title--sm">Shake to reveal</h1>
             <p class="screen-sub">Shake your phone or tap the screen to reveal your fortune.</p>
+            <button class="shake-enable" type="button" data-action="enable-shake" hidden>Enable shake</button>
           </div>
 
           <button class="fortune-container" type="button" data-action="reveal-fortune" aria-label="Reveal your fortune">
+            <span class="shake-charge" aria-hidden="true"></span>
+            <span class="fortune-aura" aria-hidden="true"></span>
             <span class="fortune-slip-preview">
               <img class="bowl-line" src="asset/app/bowl-line-gold.svg" alt="" width="236" height="165" />
             </span>
@@ -186,7 +194,11 @@
               <img class="btn-icon" src="asset/app/ic-share.svg" alt="" width="20" height="20" />
               Share my fortune
             </button>
-            <button class="link-btn" type="button" data-action="try-again">Try Again</button>
+            <div class="result-links">
+              <button class="link-btn" type="button" data-action="save-image">Save as image</button>
+              <span class="result-links-sep" aria-hidden="true">·</span>
+              <button class="link-btn" type="button" data-action="try-again">Try again</button>
+            </div>
           </div>
         </div>
       </section>

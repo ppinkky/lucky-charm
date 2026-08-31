@@ -385,20 +385,161 @@ button {
   background: var(--paper-2);
 }
 .shake-body {
+  position: relative;
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 36px;
   padding: 28px 20px 42px;
+  overflow: hidden;
 }
 .shake-head {
+  position: relative;
+  z-index: 2;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 6px;
 }
+.screen--shake .ornament {
+  animation: twinkle 2.6s ease-in-out infinite;
+}
+
+/* ambient glow that breathes behind the bowl */
+.shake-aura {
+  position: absolute;
+  left: 50%;
+  top: 52%;
+  width: 132%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at center,
+    rgba(214, 102, 34, 0.16) 0%,
+    rgba(148, 132, 57, 0.1) 38%,
+    rgba(148, 132, 57, 0) 68%
+  );
+  pointer-events: none;
+  z-index: 0;
+  animation: aura-pulse 5s ease-in-out infinite;
+}
+@keyframes aura-pulse {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(0.92);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.08);
+    opacity: 1;
+  }
+}
+
+/* drifting sparks */
+.shake-sparks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+.shake-sparks i {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--olive);
+  opacity: 0;
+  animation: spark 6s ease-in-out infinite;
+}
+.shake-sparks i:nth-child(1) {
+  left: 14%;
+  top: 26%;
+  animation-delay: 0s;
+}
+.shake-sparks i:nth-child(2) {
+  left: 82%;
+  top: 20%;
+  background: var(--terracotta);
+  animation-delay: 0.8s;
+}
+.shake-sparks i:nth-child(3) {
+  left: 24%;
+  top: 68%;
+  animation-delay: 1.6s;
+}
+.shake-sparks i:nth-child(4) {
+  left: 74%;
+  top: 74%;
+  animation-delay: 2.4s;
+}
+.shake-sparks i:nth-child(5) {
+  left: 9%;
+  top: 48%;
+  background: var(--terracotta);
+  animation-delay: 3.1s;
+}
+.shake-sparks i:nth-child(6) {
+  left: 90%;
+  top: 52%;
+  animation-delay: 3.8s;
+}
+.shake-sparks i:nth-child(7) {
+  left: 44%;
+  top: 14%;
+  animation-delay: 4.6s;
+}
+.shake-sparks i:nth-child(8) {
+  left: 58%;
+  top: 86%;
+  background: var(--terracotta);
+  animation-delay: 5.3s;
+}
+@keyframes spark {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translateY(6px) scale(0.6);
+  }
+  20% {
+    opacity: 0.9;
+    transform: translateY(0) scale(1);
+  }
+  55% {
+    opacity: 0.25;
+    transform: translateY(-10px) scale(0.85);
+  }
+  75% {
+    opacity: 0;
+    transform: translateY(-16px) scale(0.6);
+  }
+}
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+.shake-enable {
+  margin-top: 4px;
+  padding: 7px 16px;
+  border: 1px solid var(--olive);
+  border-radius: 60px;
+  background: transparent;
+  color: var(--olive);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
 .fortune-container {
+  position: relative;
+  z-index: 2;
   flex: 1;
   width: 100%;
   min-height: 420px;
@@ -414,8 +555,72 @@ button {
   box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.08);
   overflow: hidden;
   cursor: pointer;
+  animation: card-breathe 4.5s ease-in-out infinite;
+}
+@keyframes card-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.08);
+  }
+  50% {
+    transform: scale(1.012);
+    box-shadow: 0 16px 34px -10px rgba(148, 132, 57, 0.28);
+  }
+}
+/* halo inside the bowl — invisible at rest, blooms as shake energy builds */
+.fortune-aura {
+  position: absolute;
+  left: 50%;
+  top: 44%;
+  width: 80%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(calc(0.55 + var(--charge, 0) * 0.8));
+  background: radial-gradient(circle at center, rgba(250, 247, 242, 0.75) 0%, rgba(148, 132, 57, 0) 70%);
+  opacity: calc(0.12 + var(--charge, 0) * 0.88);
+  pointer-events: none;
+  transition:
+    transform 0.2s ease-out,
+    opacity 0.2s ease-out;
+}
+.screen--shake .fortune-slip-preview {
+  animation: preview-glow 4s ease-in-out infinite;
+}
+@keyframes preview-glow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 0 rgba(148, 132, 57, 0));
+  }
+  50% {
+    filter: drop-shadow(0 4px 14px rgba(148, 132, 57, 0.45));
+  }
+}
+.screen--shake .charm-wordmark {
+  animation: fade-pulse 3.4s ease-in-out infinite;
+}
+@keyframes fade-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+/* energy fills the bowl from the bottom as you shake (--charge: 0 → 1) */
+.shake-charge {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(var(--charge, 0) * 100%);
+  background: linear-gradient(to top, rgba(148, 132, 57, 0.5), rgba(148, 132, 57, 0.04));
+  pointer-events: none;
+  transition: height 0.16s ease-out;
 }
 .fortune-slip-preview {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -747,8 +952,21 @@ button {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
+}
+.result-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.result-links-sep {
+  color: var(--muted);
+  font-size: 12px;
+}
+.btn.is-busy {
+  opacity: 0.7;
+  pointer-events: none;
 }
 
 /* ---------- error ---------- */

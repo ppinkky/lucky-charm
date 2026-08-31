@@ -11,15 +11,17 @@
 
   var app = document.getElementById('app');
   var statusEl = document.getElementById('ritual-status');
+  var isLocal = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(window.location.hostname);
   var screens = {};
   var current = 'opening';
   var busy = false;
   var fortunes = null;
   var drawn = null;
   var motionEnabled = false; // devicemotion listener attached
+  var motionEventSeen = false; // at least one devicemotion event has actually fired
   var motionArmed = false; // true only while the shake screen is showing
   var shakeEnergy = 0; // accumulates while the phone is being shaken, then decays
-  var SHAKE_TRIGGER = 95; // energy needed to break the bowl open
+  var SHAKE_TRIGGER = 60; // energy needed to break the bowl open
 
   /* Haptics — navigator.vibrate is Android/Chrome only; iOS Safari has no web haptic
      API, so this is a progressive enhancement and silently no-ops elsewhere. */
@@ -85,6 +87,7 @@
     current = name;
     motionArmed = name === 'shake';
     shakeEnergy = 0;
+    updateEnableShakeButton();
     if (app) app.scrollTop = 0;
     window.scrollTo(0, 0);
 
@@ -232,7 +235,7 @@
     if (busy || current !== 'shake' || !drawn) return;
     busy = true;
     motionArmed = false;
-    shakeEnergy = 0;
+    resetCharge();
     haptic([0, 35, 45, 70]); // the bowl cracks open
     announce('The bowl is shaking.');
 
@@ -241,7 +244,6 @@
       goToResult();
       return;
     }
-    card.classList.remove('is-charging');
     card.classList.add('is-shaking');
     window.setTimeout(function () {
       card.classList.remove('is-shaking');
@@ -256,46 +258,396 @@
   function tryAgain() {
     drawn = null;
     busy = false;
-    shakeEnergy = 0;
+    resetCharge();
     var card = screens.shake.querySelector('.fortune-container');
-    if (card) card.classList.remove('is-shaking', 'is-opening', 'is-charging');
+    if (card) card.classList.remove('is-shaking', 'is-opening');
     show('opening');
     announce('');
   }
 
-  /* ---------- share ---------- */
-  function shareFortune() {
-    if (!drawn) return;
-    var title = 'CHARM — Fortune ' + pad2(drawn.id) + ': ' + drawn.title;
-    var text = drawn.title + ' — ' + drawn.overall + '\n\nDrawn at Sala Thai · Food · Luck · Prosperity';
-    var url = window.location.href;
+  /* ---------- share / save the fortune slip as an image ---------- */
+  var IS_IOS =
+    /iP(hone|ad|od)/.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
-    if (navigator.share) {
-      navigator.share({ title: title, text: text, url: url }).catch(function () {});
-      return;
+  function fileName() {
+    return 'charm-fortune-' + pad2(drawn.id) + '.png';
+  }
+  function shareText() {
+    return 'My fortune from CHARM at Sala Thai — ' + drawn.title + '. Food, luck, prosperity.';
+  }
+
+  function loadImage(src) {
+    return new Promise(function (resolve) {
+      if (!src) {
+        resolve(null);
+        return;
+      }
+      var img = new Image();
+      img.onload = function () {
+        resolve(img);
+      };
+      img.onerror = function () {
+        resolve(null);
+      };
+      img.src = src;
+    });
+  }
+
+  /* Purpose-built 1080×1920 portrait — sized for an Instagram story, styled like
+     the on-screen fortune slip. Returns a Promise<HTMLCanvasElement>. */
+  function buildShareCanvas(f) {
+    var W = 1080;
+    var H = 1920;
+    var canvas = document.createElement('canvas');
+    canvas.width = W;
+    canvas.height = H;
+    var ctx = canvas.getContext('2d');
+
+    var SANS = "'Helvetica Neue', Helvetica, Arial, sans-serif";
+    var INK = '#2b2727';
+    var BROWN = '#3c2e21';
+    var MUTED = '#8c7c72';
+    var OLIVE = '#948439';
+    var M = 112;
+    var CW = W - M * 2;
+    var cx = W / 2;
+
+    function font(px, weight) {
+      return (weight || 400) + ' ' + px + "px " + SANS;
     }
+    function wrap(text, maxW) {
+      var words = String(text == null ? '' : text).split(/\s+/);
+      var lines = [];
+      var line = '';
+      for (var i = 0; i < words.length; i++) {
+        var test = line ? line + ' ' + words[i] : words[i];
+        if (line && ctx.measureText(test).width > maxW) {
+          lines.push(line);
+          line = words[i];
+        } else {
+          line = test;
+        }
+      }
+      if (line) lines.push(line);
+      return lines;
+    }
+    function para(text, x, y, maxW, lh, align) {
+      ctx.textAlign = align || 'left';
+      var lines = wrap(text, maxW);
+      for (var i = 0; i < lines.length; i++) ctx.fillText(lines[i], x, y + i * lh);
+      return y + lines.length * lh;
+    }
+    function starMark(x, y, r) {
+      ctx.fillStyle = OLIVE;
+      ctx.beginPath();
+      ctx.moveTo(x, y - r);
+      ctx.lineTo(x + r * 0.32, y - r * 0.32);
+      ctx.lineTo(x + r, y);
+      ctx.lineTo(x + r * 0.32, y + r * 0.32);
+      ctx.lineTo(x, y + r);
+      ctx.lineTo(x - r * 0.32, y + r * 0.32);
+      ctx.lineTo(x - r, y);
+      ctx.lineTo(x - r * 0.32, y - r * 0.32);
+      ctx.closePath();
+      ctx.fill();
+    }
+    function starDiv(y) {
+      ctx.strokeStyle = OLIVE;
+      ctx.globalAlpha = 0.4;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(M, y);
+      ctx.lineTo(cx - 28, y);
+      ctx.moveTo(cx + 28, y);
+      ctx.lineTo(W - M, y);
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+      starMark(cx, y, 7);
+      return y + 44;
+    }
+
+    return Promise.all([
+      loadImage(f.luckyDish ? foodSrc(f.image) : null),
+      loadImage('asset/app/charm-wordmark.svg'),
+    ]).then(function (imgs) {
+      var dishImg = imgs[0];
+      var mark = imgs[1];
+
+      ctx.fillStyle = '#faf7f2';
+      ctx.fillRect(0, 0, W, H);
+      ctx.strokeStyle = OLIVE;
+      ctx.lineWidth = 2;
+      ctx.strokeRect(40.5, 40.5, W - 81, H - 81);
+
+      ctx.textAlign = 'center';
+      var y = 156;
+
+      ctx.fillStyle = MUTED;
+      ctx.font = font(20, 700);
+      ctx.fillText('YOUR FORTUNE IS REVEALED', cx, y);
+      y += 104;
+
+      ctx.fillStyle = INK;
+      ctx.font = font(116, 300);
+      ctx.fillText(pad2(f.id), cx, y);
+      y += 76;
+
+      ctx.font = font(46, 700);
+      var tLines = wrap((f.title || '').toUpperCase(), CW);
+      for (var i = 0; i < tLines.length; i++) {
+        ctx.fillText(tLines[i], cx, y);
+        y += 56;
+      }
+      if (f.thaiTitle) {
+        ctx.fillStyle = MUTED;
+        ctx.font = font(28);
+        ctx.fillText(f.thaiTitle, cx, y);
+        y += 40;
+      }
+      y += 16;
+
+      y = starDiv(y) + 20;
+      ctx.fillStyle = OLIVE;
+      ctx.font = font(19, 700);
+      ctx.fillText('YOUR FORTUNE (OVERALL)', cx, y);
+      y += 44;
+      ctx.fillStyle = BROWN;
+      ctx.font = font(27);
+      y = para(f.overall, cx, y, CW, 39, 'center');
+      y += 26;
+
+      y = starDiv(y) + 22;
+      var areas = [
+        ['LOVE', '#d4a7a0', f.love],
+        ['WEALTH', '#948439', f.wealth],
+        ['WORK', '#97b3b0', f.workStudy],
+        ['HEALTH', '#d66622', f.health],
+      ];
+      for (var a = 0; a < areas.length; a++) {
+        ctx.fillStyle = areas[a][1];
+        ctx.beginPath();
+        ctx.arc(M + 9, y - 8, 9, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = INK;
+        ctx.font = font(21, 700);
+        ctx.textAlign = 'left';
+        ctx.fillText(areas[a][0], M + 34, y);
+        y += 34;
+        ctx.fillStyle = BROWN;
+        ctx.font = font(24);
+        y = para(areas[a][2], M, y, CW, 34, 'left');
+        y += 26;
+      }
+
+      y = starDiv(y) + 20;
+      ctx.textAlign = 'center';
+      ctx.fillStyle = OLIVE;
+      ctx.font = font(19, 700);
+      ctx.fillText(f.luckyDish ? 'YOUR LUCKY DISH' : 'YOUR LUCKY SIGN', cx, y);
+      y += 42;
+      if (f.luckyDish) {
+        if (dishImg) {
+          var dw = 210;
+          var dh = 155;
+          try {
+            ctx.drawImage(dishImg, cx - dw / 2, y - 12, dw, dh);
+          } catch (e) {
+            /* ignore */
+          }
+          y += dh + 6;
+        }
+        ctx.fillStyle = INK;
+        ctx.font = font(30, 700);
+        ctx.fillText((f.luckyDish || '').toUpperCase(), cx, y);
+        y += 36;
+        if (f.luckyDishNote) {
+          ctx.fillStyle = MUTED;
+          ctx.font = font(23);
+          y = para(f.luckyDishNote, cx, y, CW, 32, 'center');
+        }
+      } else if (f.luckySign) {
+        ctx.fillStyle = BROWN;
+        ctx.font = font(25);
+        y = para(f.luckySign, cx, y, CW, 36, 'center');
+      }
+      y += 30;
+
+      y = starDiv(y) + 46;
+      if (mark) {
+        var mw = 264;
+        var mh = mw * (44 / 227);
+        try {
+          ctx.drawImage(mark, cx - mw / 2, y - mh, mw, mh);
+        } catch (e) {
+          /* ignore */
+        }
+        y += 54;
+      }
+      ctx.fillStyle = '#2b2626';
+      ctx.font = font(21, 700);
+      ctx.fillText('SALA THAI', cx, y);
+      y += 28;
+      ctx.fillStyle = '#8c7d73';
+      ctx.font = font(17);
+      ctx.fillText('307 Amsterdam Ave, New York, NY 10023', cx, y);
+
+      ctx.fillStyle = OLIVE;
+      ctx.font = font(17, 700);
+      ctx.fillText('FOOD · LUCK · PROSPERITY', cx, Math.min(H - 120, y + 132));
+
+      return canvas;
+    });
+  }
+
+  function canvasToBlob(canvas) {
+    return new Promise(function (resolve) {
+      if (canvas.toBlob) canvas.toBlob(resolve, 'image/png');
+      else {
+        try {
+          var bin = atob(canvas.toDataURL('image/png').split(',')[1]);
+          var arr = new Uint8Array(bin.length);
+          for (var i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+          resolve(new Blob([arr], { type: 'image/png' }));
+        } catch (e) {
+          resolve(null);
+        }
+      }
+    });
+  }
+
+  function fortuneImage() {
+    return buildShareCanvas(drawn).then(canvasToBlob);
+  }
+
+  function openOrDownload(blob) {
+    var url = URL.createObjectURL(blob);
+    if (IS_IOS) {
+      window.open(url, '_blank'); // user long-presses → Save to Photos
+      announce('Long-press the image, then choose Save to Photos.');
+    } else {
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = fileName();
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      announce('Fortune image saved.');
+    }
+    window.setTimeout(function () {
+      URL.revokeObjectURL(url);
+    }, 10000);
+  }
+
+  function copyFallback() {
+    var text = shareText() + '\n' + window.location.href;
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text + '\n' + url).then(
-        function () {
-          announce('Fortune copied to clipboard.');
-        },
-        function () {}
-      );
+      navigator.clipboard.writeText(text).then(function () {
+        announce('Fortune copied to clipboard.');
+      }, function () {});
     }
   }
 
+  function shareFortune() {
+    if (!drawn) return;
+    var btn = document.querySelector('[data-action="share"]');
+    if (btn) btn.classList.add('is-busy');
+    announce('Preparing your fortune image…');
+
+    fortuneImage()
+      .then(function (blob) {
+        if (btn) btn.classList.remove('is-busy');
+        if (!blob) {
+          copyFallback();
+          return;
+        }
+        var file = new File([blob], fileName(), { type: 'image/png' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          navigator
+            .share({ files: [file], title: 'My CHARM fortune', text: shareText() })
+            .catch(function () {});
+        } else if (navigator.share) {
+          navigator
+            .share({ title: 'My CHARM fortune', text: shareText(), url: window.location.href })
+            .catch(function () {});
+        } else {
+          openOrDownload(blob); // desktop — no Web Share
+        }
+      })
+      .catch(function (err) {
+        if (btn) btn.classList.remove('is-busy');
+        console.error('[charm] share image failed:', err);
+        copyFallback();
+      });
+  }
+
+  function saveImage() {
+    if (!drawn) return;
+    announce('Saving your fortune image…');
+    fortuneImage()
+      .then(function (blob) {
+        if (blob) openOrDownload(blob);
+        else copyFallback();
+      })
+      .catch(function (err) {
+        console.error('[charm] save image failed:', err);
+        copyFallback();
+      });
+  }
+
   /* ---------- device shake ---------- */
+  function shakeCard() {
+    return screens.shake && screens.shake.querySelector('.fortune-container');
+  }
+
+  function paintCharge() {
+    var card = shakeCard();
+    if (!card) return;
+    var ratio = Math.min(1, shakeEnergy / SHAKE_TRIGGER);
+    card.style.setProperty('--charge', ratio.toFixed(3));
+    card.classList.toggle('is-charging', ratio > 0.04);
+  }
+
+  function resetCharge() {
+    shakeEnergy = 0;
+    var card = shakeCard();
+    if (card) {
+      card.style.setProperty('--charge', '0');
+      card.classList.remove('is-charging');
+    }
+  }
+
+  var chargeDecay = 0;
+  // Shared by real device shakes and the local `s`-key simulator.
+  function addShakeEnergy(amount) {
+    if (!motionArmed || busy || current !== 'shake') return;
+    shakeEnergy += amount;
+    haptic(14); // a tick per jolt — like rattling a real bowl
+    paintCharge();
+
+    window.clearTimeout(chargeDecay);
+    chargeDecay = window.setTimeout(resetCharge, 650);
+
+    if (shakeEnergy >= SHAKE_TRIGGER) {
+      window.clearTimeout(chargeDecay);
+      revealFortune();
+    }
+  }
+
   function requestMotionPermission() {
-    if (motionEnabled) return;
     var DME = window.DeviceMotionEvent;
     if (DME && typeof DME.requestPermission === 'function') {
+      // iOS — must be called from a user gesture; returns 'granted' / 'denied'.
       DME.requestPermission()
         .then(function (state) {
-          if (state === 'granted') enableMotion();
+          if (state === 'granted') {
+            enableMotion();
+            updateEnableShakeButton();
+          }
         })
         .catch(function () {});
     } else if (DME) {
-      enableMotion();
+      enableMotion(); // Android / desktop Chrome — no prompt needed
     }
   }
 
@@ -305,45 +657,43 @@
 
     var last = null;
     var lastAt = 0;
-    var decayTimer = 0;
 
     window.addEventListener('devicemotion', function (e) {
+      motionEventSeen = true;
+      updateEnableShakeButton();
       if (!motionArmed || busy) return;
+
       var a = e.accelerationIncludingGravity || e.acceleration;
       if (!a) return;
 
       var now = Date.now();
-      if (now - lastAt < 80) return;
+      if (now - lastAt < 70) return;
       var x = a.x || 0;
       var y = a.y || 0;
       var z = a.z || 0;
 
       if (last) {
         var delta = Math.abs(x - last.x) + Math.abs(y - last.y) + Math.abs(z - last.z);
-        if (delta > 12) {
-          // Each jolt adds energy and a short haptic tick — like rattling a real bowl.
-          shakeEnergy += delta;
-          haptic(14);
-
-          var card = screens.shake && screens.shake.querySelector('.fortune-container');
-          if (card) card.classList.add('is-charging');
-
-          window.clearTimeout(decayTimer);
-          decayTimer = window.setTimeout(function () {
-            shakeEnergy = 0;
-            if (card) card.classList.remove('is-charging');
-          }, 600);
-
-          if (shakeEnergy >= SHAKE_TRIGGER) {
-            shakeEnergy = 0;
-            revealFortune();
-          }
-        }
+        if (delta > 6) addShakeEnergy(delta); // low gate — accumulate; threshold does the rest
       }
-
       last = { x: x, y: y, z: z };
       lastAt = now;
     });
+  }
+
+  /* "Enable shake" affordance — shown only when motion needs a permission tap
+     (iOS) or when no motion events are arriving despite being enabled. */
+  function updateEnableShakeButton() {
+    var btn = screens.shake && screens.shake.querySelector('.shake-enable');
+    if (!btn) return;
+    var DME = window.DeviceMotionEvent;
+    var needsPrompt =
+      DME && typeof DME.requestPermission === 'function' && !motionEnabled && !motionEventSeen;
+    btn.hidden = !(current === 'shake' && needsPrompt);
+  }
+
+  function enableShake() {
+    requestMotionPermission();
   }
 
   /* ---------- wiring ---------- */
@@ -353,7 +703,9 @@
     },
     'begin-reveal': beginReveal,
     'reveal-fortune': revealFortune,
+    'enable-shake': enableShake,
     share: shareFortune,
+    'save-image': saveImage,
     'try-again': tryAgain,
   };
 
@@ -367,11 +719,23 @@
     }
   });
 
+  // Local-only shake simulator: press "s" (or Space) on the shake screen to pump
+  // energy, so the shake → charge → reveal loop is testable without a phone.
+  if (isLocal) {
+    window.addEventListener('keydown', function (e) {
+      if (current !== 'shake') return;
+      if (e.key === 's' || e.key === 'S' || e.key === ' ') {
+        e.preventDefault();
+        addShakeEnergy(22);
+      }
+    });
+  }
+
   // Prime the data early so the first tap feels instant; ignore failures here.
   loadFortunes().catch(function () {});
 
   // Local-only deep link for design QA, e.g. ?screen=result — never active in production.
-  var isLocal = /^(localhost|127\.0\.0\.1)$/.test(window.location.hostname);
+  // Add #share on the result screen to render the generated share image full-bleed.
   var devScreen = new URLSearchParams(window.location.search).get('screen');
   if (isLocal && devScreen && screens[devScreen]) {
     if (devScreen === 'result') {
@@ -379,6 +743,13 @@
         pickFortune();
         renderResult(drawn);
         show('result');
+        if (window.location.hash === '#share') {
+          buildShareCanvas(drawn).then(function (c) {
+            c.style.cssText = 'display:block;width:100%;height:auto';
+            app.innerHTML = '';
+            app.appendChild(c);
+          });
+        }
       });
     } else {
       show(devScreen);
