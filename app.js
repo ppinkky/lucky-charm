@@ -578,8 +578,96 @@
     });
   }
 
+  /* Preferred path: rasterize the real on-screen slip, so the shared image is an
+     exact match of what the visitor just saw. html2canvas is lazy-loaded; if it
+     can't load, fortuneImage() falls back to the hand-drawn canvas above. */
+  var H2C_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+  var h2cPromise = null;
+  function loadHtml2Canvas() {
+    if (h2cPromise) return h2cPromise;
+    h2cPromise = new Promise(function (resolve, reject) {
+      if (window.html2canvas) {
+        resolve(window.html2canvas);
+        return;
+      }
+      var s = document.createElement('script');
+      s.src = H2C_SRC;
+      s.async = true;
+      s.onload = function () {
+        if (window.html2canvas) resolve(window.html2canvas);
+        else reject(new Error('html2canvas missing'));
+      };
+      s.onerror = function () {
+        reject(new Error('html2canvas load failed'));
+      };
+      document.head.appendChild(s);
+    });
+    return h2cPromise;
+  }
+
+  // Center the captured slip on a 1080×1920 cream field — a proper story canvas.
+  function composeStory(slipCanvas) {
+    var W = 1080;
+    var H = 1920;
+    var out = document.createElement('canvas');
+    out.width = W;
+    out.height = H;
+    var ctx = out.getContext('2d');
+    ctx.fillStyle = '#faf7f2';
+    ctx.fillRect(0, 0, W, H);
+
+    var pad = 76;
+    var scale = Math.min(
+      (W - pad * 2) / slipCanvas.width,
+      (H - pad * 2 - 96) / slipCanvas.height,
+      1
+    );
+    var dw = slipCanvas.width * scale;
+    var dh = slipCanvas.height * scale;
+    var dx = (W - dw) / 2;
+    var dy = Math.max(pad, (H - dh) / 2 - 70); // slight upward bias for the story UI
+    ctx.drawImage(slipCanvas, dx, dy, dw, dh);
+
+    ctx.fillStyle = '#948439';
+    ctx.font = "700 17px 'Helvetica Neue', Helvetica, Arial, sans-serif";
+    ctx.textAlign = 'center';
+    ctx.fillText('FOOD · LUCK · PROSPERITY', W / 2, Math.min(H - 96, dy + dh + 68));
+
+    return out;
+  }
+
+  function renderSlipCanvas() {
+    var slip = document.getElementById('slip');
+    if (!slip) return Promise.reject(new Error('no slip element'));
+    return loadHtml2Canvas()
+      .then(function (h2c) {
+        return h2c(slip, {
+          backgroundColor: '#faf7f2',
+          scale: Math.max(2, 1024 / (slip.offsetWidth || 360)),
+          useCORS: true,
+          logging: false,
+          onclone: function (doc) {
+            var s = doc.getElementById('slip');
+            if (s) {
+              // freeze the entrance animation so the capture is the settled state
+              s.style.animation = 'none';
+              s.style.opacity = '1';
+              s.style.transform = 'none';
+              s.style.boxShadow = 'none';
+            }
+          },
+        });
+      })
+      .then(composeStory);
+  }
+
   function fortuneImage() {
-    return buildShareCanvas(drawn).then(canvasToBlob);
+    return renderSlipCanvas()
+      .catch(function (err) {
+        console.warn('[charm] slip capture failed — using drawn fallback:', err);
+        return buildShareCanvas(drawn);
+      })
+      .then(canvasToBlob);
   }
 
   /* The image is rendered the moment the result screen appears and cached, so the
@@ -840,7 +928,7 @@
         renderResult(drawn);
         show('result');
         if (window.location.hash === '#share') {
-          buildShareCanvas(drawn).then(function (c) {
+          renderSlipCanvas().then(function (c) {
             c.style.cssText = 'display:block;width:100%;height:auto';
             app.innerHTML = '';
             app.appendChild(c);
