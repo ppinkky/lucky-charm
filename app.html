@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta
+      name="description"
+      content="CHARM / ชาม — draw a fortune with Sala Thai. An interactive dining ritual exploring food, luck, and prosperity."
+    />
+    <meta name="theme-color" content="#3c2e21" />
+    <title>CHARM / ชาม — Draw your fortune</title>
+    <link rel="icon" type="image/svg+xml" href="asset/favicon.svg" />
+    <link rel="stylesheet" href="app.css" />
+  </head>
+  <body>
+    <div class="app" id="app">
+      <p class="sr-only" role="status" aria-live="polite" id="ritual-status"></p>
+
+      <!-- 1 — Opening -->
+      <section class="screen screen--opening is-active" id="screen-opening" data-screen="opening" aria-label="Welcome">
+        <header class="opening-header">
+          <img class="opening-logo" src="asset/app/logo-lockup.svg" alt="CHARM" width="185" height="59" />
+        </header>
+
+        <div class="opening-body">
+          <div class="opening-panel">
+            <p class="opening-collab">
+              <span>CHARM&reg;</span>
+              <span>IN COLLABORATION</span>
+              <span>WITH SALA THAI</span>
+            </p>
+            <p class="opening-desc">
+              Every great meal starts with a little luck. Draw a fortune, discover your destiny, and find out which dish
+              the stars have chosen for you tonight.
+            </p>
+          </div>
+
+          <button class="btn btn--primary" type="button" data-action="to-focus">Reveal my fortune</button>
+        </div>
+      </section>
+
+      <!-- 2 — Focus your mind -->
+      <section class="screen screen--focus" id="screen-focus" data-screen="focus" aria-label="Focus your mind" hidden>
+        <div class="focus-body">
+          <div class="focus-main">
+            <div class="focus-head">
+              <span class="ornament" aria-hidden="true"><i class="ornament-rule"></i>&#10022;<i class="ornament-rule"></i></span>
+              <h1 class="screen-title">Focus your mind</h1>
+              <span class="orbs orbs--sm" aria-hidden="true">
+                <i class="orb orb--gold"></i><i class="orb orb--orange"></i><i class="orb orb--brown"></i>
+              </span>
+              <p class="screen-sub">Let the spirits guide you</p>
+            </div>
+
+            <img class="bowl-line" src="asset/app/bowl-line.svg" alt="" width="236" height="165" />
+
+            <p class="focus-copy">
+              Close your eyes. Think of a question about love, health, wealth, or work. When you are ready, continue.
+            </p>
+          </div>
+
+          <button class="btn btn--primary" type="button" data-action="begin-reveal">I&rsquo;m ready</button>
+        </div>
+      </section>
+
+      <!-- 3 — Revealing -->
+      <section
+        class="screen screen--revealing"
+        id="screen-revealing"
+        data-screen="revealing"
+        aria-label="Your fortune is revealing"
+        hidden
+      >
+        <div class="revealing-body">
+          <div class="revealing-head">
+            <h1 class="screen-title screen-title--sm">Your fortune is revealing</h1>
+            <p class="screen-sub">Be prepared&hellip;</p>
+          </div>
+          <span class="orbs orbs--lg" aria-hidden="true">
+            <i class="orb orb--gold"></i><i class="orb orb--orange"></i><i class="orb orb--brown"></i>
+          </span>
+        </div>
+      </section>
+
+      <!-- 4 — Shake to reveal -->
+      <section class="screen screen--shake" id="screen-shake" data-screen="shake" aria-label="Shake to reveal" hidden>
+        <div class="shake-body">
+          <div class="shake-head">
+            <span class="ornament" aria-hidden="true"><i class="ornament-rule"></i>&#10022;<i class="ornament-rule"></i></span>
+            <h1 class="screen-title screen-title--sm">Shake to reveal</h1>
+            <p class="screen-sub">Shake your phone or tap the screen to reveal your fortune.</p>
+          </div>
+
+          <button class="fortune-container" type="button" data-action="reveal-fortune" aria-label="Reveal your fortune">
+            <span class="fortune-slip-preview">
+              <img class="bowl-line" src="asset/app/bowl-line-gold.svg" alt="" width="236" height="165" />
+            </span>
+            <img class="charm-wordmark" src="asset/app/charm-wordmark.svg" alt="Food Luck Prosperity Charm" width="227" height="44" />
+          </button>
+        </div>
+      </section>
+
+      <!-- 5 — Fortune revealed -->
+      <section
+        class="screen screen--result"
+        id="screen-result"
+        data-screen="result"
+        aria-label="Your fortune is revealed"
+        hidden
+      >
+        <div class="result-body">
+          <p class="result-eyebrow">Your fortune is revealed</p>
+
+          <article class="slip" id="slip">
+            <header class="slip-head">
+              <p class="slip-number" id="slip-number">00</p>
+              <span class="slip-vrule" aria-hidden="true"></span>
+              <div class="slip-title-group">
+                <h1 class="slip-title" id="slip-title">&nbsp;</h1>
+                <p class="slip-title-th" id="slip-title-th" hidden></p>
+              </div>
+            </header>
+
+            <div class="slip-div" aria-hidden="true"><i></i><img src="asset/app/ic-star.svg" alt="" width="10" height="10" /><i></i></div>
+
+            <section class="slip-overall">
+              <p class="slip-kicker">Your fortune (overall)</p>
+              <p id="slip-overall"></p>
+            </section>
+
+            <div class="slip-div" aria-hidden="true"><i></i><img src="asset/app/ic-star.svg" alt="" width="10" height="10" /><i></i></div>
+
+            <section class="slip-areas" id="slip-areas">
+              <div class="area area--love">
+                <span class="area-icon"><img src="asset/app/ic-heart.svg" alt="" width="12" height="12" /></span>
+                <span class="area-label">Love</span>
+                <span class="area-vrule" aria-hidden="true"></span>
+                <p class="area-text" id="area-love"></p>
+              </div>
+              <div class="area area--wealth">
+                <span class="area-icon"><img src="asset/app/ic-dollar.svg" alt="" width="12" height="12" /></span>
+                <span class="area-label">Wealth</span>
+                <span class="area-vrule" aria-hidden="true"></span>
+                <p class="area-text" id="area-wealth"></p>
+              </div>
+              <div class="area area--work">
+                <span class="area-icon"><img src="asset/app/ic-briefcase.svg" alt="" width="12" height="12" /></span>
+                <span class="area-label">Work</span>
+                <span class="area-vrule" aria-hidden="true"></span>
+                <p class="area-text" id="area-work"></p>
+              </div>
+              <div class="area area--health">
+                <span class="area-icon"><img src="asset/app/ic-activity.svg" alt="" width="12" height="12" /></span>
+                <span class="area-label">Health</span>
+                <span class="area-vrule" aria-hidden="true"></span>
+                <p class="area-text" id="area-health"></p>
+              </div>
+            </section>
+
+            <div class="slip-div" aria-hidden="true"><i></i><img src="asset/app/ic-star.svg" alt="" width="10" height="10" /><i></i></div>
+
+            <section class="slip-dish" id="slip-dish">
+              <p class="slip-kicker slip-kicker--center" id="dish-kicker">Your lucky dish</p>
+              <div class="dish-row">
+                <div class="dish-thumb" id="dish-thumb">
+                  <img id="dish-img" src="" alt="" width="82" height="60" />
+                </div>
+                <div class="dish-meta">
+                  <p class="dish-name" id="dish-name"></p>
+                  <p class="dish-note" id="dish-note" hidden></p>
+                </div>
+              </div>
+            </section>
+
+            <div class="slip-div" aria-hidden="true"><i></i><img src="asset/app/ic-star.svg" alt="" width="10" height="10" /><i></i></div>
+
+            <footer class="slip-foot">
+              <img class="slip-wordmark" src="asset/app/charm-wordmark.svg" alt="Charm" width="158" height="32" />
+              <p class="slip-venue">Sala Thai</p>
+              <p class="slip-address">307 Amsterdam Ave, New York, NY 10023</p>
+            </footer>
+          </article>
+
+          <div class="result-actions">
+            <button class="btn btn--primary" type="button" data-action="share">
+              <img class="btn-icon" src="asset/app/ic-share.svg" alt="" width="20" height="20" />
+              Share my fortune
+            </button>
+            <button class="link-btn" type="button" data-action="try-again">Try Again</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Recoverable failure -->
+      <section class="screen screen--error" id="screen-error" data-screen="error" aria-label="Something went wrong" hidden>
+        <div class="error-body">
+          <span class="ornament" aria-hidden="true"><i class="ornament-rule"></i>&#10022;<i class="ornament-rule"></i></span>
+          <p class="error-copy">The bowl needs a moment.</p>
+          <button class="btn btn--primary" type="button" data-action="try-again">Try again</button>
+        </div>
+      </section>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
