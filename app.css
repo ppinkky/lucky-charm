@@ -390,7 +390,8 @@ button {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 36px;
+  justify-content: center;
+  gap: clamp(20px, 4vh, 36px);
   padding: 28px 20px 42px;
   overflow: hidden;
 }
@@ -540,15 +541,20 @@ button {
 .fortune-container {
   position: relative;
   z-index: 2;
-  flex: 1;
-  width: 100%;
-  min-height: 420px;
+  /* playing-card proportion — height : width = 7 : 5. Height is capped so the
+     card always fits between the header and the footer on any device. */
+  flex: 0 1 auto;
+  align-self: center;
+  aspect-ratio: 5 / 7;
+  height: min(504px, calc(var(--app-h) - 290px));
+  width: auto;
+  max-width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  gap: clamp(40px, 11vh, 94px);
-  padding: 32px 24px 64px;
+  gap: clamp(20px, 6vh, 72px);
+  padding: 24px 20px clamp(28px, 7vh, 56px);
   border: 8px solid var(--olive);
   border-radius: 16px;
   background: var(--rose);
@@ -626,12 +632,16 @@ button {
   justify-content: center;
 }
 .screen--shake .bowl-line {
+  width: min(236px, 74%);
   animation: bowl-float 5s ease-in-out infinite;
 }
 .charm-wordmark {
   width: 227px;
   max-width: 62%;
   height: auto;
+}
+.screen--shake .charm-wordmark {
+  width: min(227px, 72%);
 }
 .fortune-container.is-charging {
   animation: card-charge 0.3s ease-in-out infinite alternate;
@@ -750,16 +760,20 @@ button {
   width: 100%;
 }
 .slip-number {
+  flex-shrink: 0;
   padding: 0 14px;
   font-weight: 300;
   font-size: 32px;
-  line-height: 1;
+  line-height: 1.15;
+  letter-spacing: 0.01em;
   color: var(--headline);
-  font-variant-numeric: lining-nums;
+  /* fixed box so the digits sit identically on screen and in the exported PNG */
 }
 .slip-vrule {
-  align-self: stretch;
+  flex-shrink: 0;
+  align-self: center;
   width: 1px;
+  height: 34px;
   background: var(--olive);
   opacity: 0.5;
 }
