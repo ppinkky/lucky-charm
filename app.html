@@ -16,8 +16,44 @@
     <div class="app" id="app">
       <p class="sr-only" role="status" aria-live="polite" id="ritual-status"></p>
 
+      <!-- 0 — Opening 1 (title splash) -->
+      <section
+        class="screen screen--splash screen--splash1 is-active"
+        id="screen-opening1"
+        data-screen="opening1"
+        data-action="advance-splash"
+        role="button"
+        tabindex="0"
+        aria-label="CHARM — Food Luck Prosperity"
+      >
+        <div class="splash-body">
+          <p class="splash-wordmark">
+            <span>FOOD LUCK</span>
+            <span>PROSPERITY</span>
+            <span>CHARM&reg;</span>
+          </p>
+        </div>
+      </section>
+
+      <!-- 0.5 — Opening 2 (mark splash) -->
+      <section
+        class="screen screen--splash screen--splash2"
+        id="screen-opening2"
+        data-screen="opening2"
+        data-action="advance-splash"
+        role="button"
+        tabindex="0"
+        aria-label="ชาม × ศาลาไทย"
+        hidden
+      >
+        <div class="splash-body">
+          <img class="splash-thai" src="asset/app/wordmark-salathai.svg" alt="ชาม × ศาลาไทย" width="358" height="69" />
+          <img class="splash-bowl" src="asset/app/bowl-line.svg" alt="" width="236" height="165" />
+        </div>
+      </section>
+
       <!-- 1 — Opening -->
-      <section class="screen screen--opening is-active" id="screen-opening" data-screen="opening" aria-label="Welcome">
+      <section class="screen screen--opening" id="screen-opening" data-screen="opening" aria-label="Welcome" hidden>
         <header class="opening-header">
           <img class="opening-logo" src="asset/app/logo-lockup.svg" alt="CHARM" width="185" height="59" />
         </header>
@@ -49,7 +85,7 @@
               <span class="orbs orbs--sm" aria-hidden="true">
                 <i class="orb orb--gold"></i><i class="orb orb--orange"></i><i class="orb orb--brown"></i>
               </span>
-              <p class="screen-sub">Let the spirits guide you</p>
+              <p class="screen-sub">Set your mind, find your flavor</p>
             </div>
 
             <img class="bowl-line" src="asset/app/bowl-line.svg" alt="" width="236" height="165" />

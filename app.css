@@ -82,28 +82,12 @@ button {
   overflow: hidden;
   background: var(--paper-2);
 }
-@media (min-width: 460px) {
-  body {
-    padding: 24px 0;
-    background: #e7e2d7;
-  }
-  .app {
-    min-height: calc(var(--app-h) - 48px);
-    border-radius: 18px;
-    box-shadow: 0 24px 60px -20px rgba(60, 46, 33, 0.35);
-  }
-}
 
 .screen {
   display: flex;
   flex-direction: column;
   min-height: var(--app-h);
   width: 100%;
-}
-@media (min-width: 460px) {
-  .screen {
-    min-height: calc(var(--app-h) - 48px);
-  }
 }
 .screen:focus {
   outline: none;
@@ -258,6 +242,101 @@ button {
   text-align: center;
   font-size: 10px;
   line-height: 1.4;
+}
+
+/* ---------- 0 · splash (Opening 1 / Opening 2) ---------- */
+.screen--splash {
+  background: var(--paper); /* #dfd8cc — matches the Main opening screen */
+  cursor: pointer;
+}
+.screen--splash:focus-visible {
+  outline-offset: -4px;
+}
+.splash-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  padding: 28px 24px 34px;
+  text-align: center;
+}
+.splash-wordmark {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+  font-weight: 700;
+  font-size: clamp(38px, 13vw, 54px);
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+  color: #000;
+}
+.splash-thai {
+  width: min(358px, 86%);
+  height: auto;
+}
+.splash-bowl {
+  width: min(236px, 60%);
+  height: auto;
+}
+
+/* entrances — spring-in with a slight overshoot; bowl gives one wiggle (per Figma motion) */
+.screen--splash1.is-active .splash-wordmark span {
+  animation: splash-line 460ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.screen--splash1.is-active .splash-wordmark span:nth-child(1) {
+  animation-delay: 120ms;
+}
+.screen--splash1.is-active .splash-wordmark span:nth-child(2) {
+  animation-delay: 360ms;
+}
+.screen--splash1.is-active .splash-wordmark span:nth-child(3) {
+  animation-delay: 600ms;
+}
+.screen--splash2.is-active .splash-thai {
+  animation: splash-pop 520ms cubic-bezier(0.45, 1.45, 0.8, 1) 80ms both;
+}
+.screen--splash2.is-active .splash-bowl {
+  animation:
+    splash-pop 520ms cubic-bezier(0.45, 1.45, 0.8, 1) 320ms both,
+    splash-wiggle 640ms ease-in-out 860ms 1;
+}
+@keyframes splash-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes splash-line {
+  from {
+    opacity: 0;
+    transform: translateY(0.5em);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes splash-wiggle {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  25% {
+    transform: rotate(-8deg);
+  }
+  50% {
+    transform: rotate(8deg);
+  }
+  75% {
+    transform: rotate(-8deg);
+  }
 }
 
 /* ---------- 1 · opening ---------- */

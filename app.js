@@ -1,5 +1,6 @@
 /* CHARM / ชาม — fortune ritual controller.
-   Screen flow: opening → focus → revealing → shake → result  (+ recoverable error).
+   Screen flow: opening1 → opening2 → opening → focus → revealing → shake → result
+   (+ recoverable error). The two opening splashes auto-advance and skip on tap.
    Reduced motion collapses revealing/shake into a direct transition to the result. */
 
 (function () {
@@ -76,9 +77,10 @@
     return f;
   }
 
+  var NO_FOOTER = { opening1: 1, opening2: 1 }; // title splashes have no footer in the design
   Array.prototype.forEach.call(document.querySelectorAll('.screen'), function (el) {
     screens[el.dataset.screen] = el;
-    el.appendChild(footerMarkup());
+    if (!NO_FOOTER[el.dataset.screen]) el.appendChild(footerMarkup());
   });
 
   /* ---------- viewport height: make every screen fit the device exactly ----------
@@ -106,6 +108,7 @@
   /* ---------- navigation ---------- */
   function show(name) {
     if (!screens[name]) return;
+    window.clearTimeout(splashTimer); // any navigation cancels a pending splash advance
     Object.keys(screens).forEach(function (key) {
       var el = screens[key];
       el.classList.remove('is-active');
@@ -234,6 +237,33 @@
     show('error');
     announce('The bowl needs a moment. Try again.');
     busy = false;
+  }
+
+  /* ---------- opening splashes (Opening 1 → Opening 2 → Opening) ---------- */
+  var SPLASH1_MS = REDUCED ? 1100 : 2200;
+  var SPLASH2_MS = REDUCED ? 1300 : 2800;
+  var splashTimer = 0;
+
+  function runSplash() {
+    show('opening1');
+    splashTimer = window.setTimeout(function () {
+      show('opening2');
+      splashTimer = window.setTimeout(function () {
+        show('opening');
+      }, SPLASH2_MS);
+    }, SPLASH1_MS);
+  }
+
+  function advanceSplash() {
+    window.clearTimeout(splashTimer);
+    if (current === 'opening1') {
+      show('opening2');
+      splashTimer = window.setTimeout(function () {
+        show('opening');
+      }, SPLASH2_MS);
+    } else if (current === 'opening2') {
+      show('opening');
+    }
   }
 
   /* ---------- ritual steps ---------- */
@@ -881,6 +911,7 @@
     'to-focus': function () {
       show('focus');
     },
+    'advance-splash': advanceSplash,
     'begin-reveal': beginReveal,
     'reveal-fortune': revealFortune,
     'enable-shake': enableShake,
@@ -897,6 +928,14 @@
       e.preventDefault();
       if (el.dataset.action !== 'reveal-fortune') haptic(10); // taps get a tick (Android)
       fn();
+    }
+  });
+
+  // Keyboard: Enter/Space skips a splash screen forward.
+  window.addEventListener('keydown', function (e) {
+    if ((current === 'opening1' || current === 'opening2') && (e.key === 'Enter' || e.key === ' ')) {
+      e.preventDefault();
+      advanceSplash();
     }
   });
 
@@ -936,6 +975,6 @@
       show(devScreen);
     }
   } else {
-    show('opening');
+    runSplash(); // Opening 1 → Opening 2 → Opening
   }
 })();
