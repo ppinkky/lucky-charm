@@ -1,5 +1,5 @@
 /* CHARM / ชาม — fortune ritual controller.
-   Screen flow: opening1 → opening2 → opening → focus → revealing → shake → result
+   Screen flow: opening1 → opening2 → opening → intention → focus → revealing → shake → result
    (+ recoverable error). The two opening splashes auto-advance and skip on tap.
    Reduced motion collapses revealing/shake into a direct transition to the result. */
 
@@ -9,6 +9,7 @@
   var REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var REVEALING_MS = 1800; // "Your fortune is revealing…" dwell
   var SHAKE_ANIM_MS = 1000; // card shake + open before result
+  var NUMBER_HOLD_MS = REDUCED ? 700 : 1200; // number screen dwell before "Reveal" fades in
 
   var app = document.getElementById('app');
   var statusEl = document.getElementById('ritual-status');
@@ -18,6 +19,7 @@
   var busy = false;
   var fortunes = null;
   var drawn = null;
+  var chosenIntent = null; // 'love' | 'money' | 'luck' — set on the intention screen, filters the pool
   var motionEnabled = false; // devicemotion listener attached
   var motionEventSeen = false; // at least one devicemotion event has actually fired
   var motionArmed = false; // true only while the shake screen is showing
@@ -109,6 +111,7 @@
   function show(name) {
     if (!screens[name]) return;
     window.clearTimeout(splashTimer); // any navigation cancels a pending splash advance
+    window.clearTimeout(numberTimer); // ditto for the number-screen "Reveal" delay
     Object.keys(screens).forEach(function (key) {
       var el = screens[key];
       el.classList.remove('is-active');
@@ -151,7 +154,14 @@
   }
 
   function pickFortune() {
-    drawn = fortunes[Math.floor(Math.random() * fortunes.length)];
+    var pool = fortunes;
+    if (chosenIntent) {
+      var matched = fortunes.filter(function (f) {
+        return f.intents && f.intents.indexOf(chosenIntent) !== -1;
+      });
+      if (matched.length) pool = matched; // fall back to the full pool only if nothing matches
+    }
+    drawn = pool[Math.floor(Math.random() * pool.length)];
     return drawn;
   }
 
@@ -224,10 +234,34 @@
     }
   }
 
+  var numberTimer = 0;
+
+  /* Beat between the shake and the slip: show just the fortune number, hold it so
+     the pause does the suspense, then fade the "Reveal" button in. */
+  function goToNumber() {
+    renderResult(drawn); // populate the slip DOM now so the share PNG can pre-render during the hold
+    var numEl = document.getElementById('number-value');
+    if (numEl) numEl.textContent = pad2(drawn.id);
+    var scr = screens.number;
+    var btn = scr.querySelector('.number-reveal');
+    scr.classList.remove('is-ready');
+    if (btn) btn.disabled = true; // no mashing through the pause
+    show('number');
+    haptic(20);
+    announce('Fortune number ' + drawn.id + '.');
+    prepareShareImage(); // head start while the number holds
+    window.clearTimeout(numberTimer);
+    numberTimer = window.setTimeout(function () {
+      scr.classList.add('is-ready');
+      if (btn) btn.disabled = false;
+      busy = false;
+    }, NUMBER_HOLD_MS);
+  }
+
   function goToResult() {
     renderResult(drawn);
     show('result');
-    prepareShareImage(); // render the shareable PNG now so Share can fire in-gesture
+    if (!sharePrepPromise) prepareShareImage(); // usually already kicked off on the number screen
     haptic(24); // a soft settle as the slip lands
     announce('Your fortune is ready. Number ' + drawn.id + ', ' + drawn.title + '.');
     busy = false;
@@ -306,7 +340,7 @@
     var body = screens.shake.querySelector('.shake-body');
     if (REDUCED || !card) {
       resetCharge();
-      goToResult();
+      goToNumber();
       return;
     }
 
@@ -328,12 +362,13 @@
       card.classList.remove('is-opening');
       if (body) body.classList.remove('is-cracking');
       resetCharge();
-      goToResult();
+      goToNumber();
     }, SHAKE_ANIM_MS);
   }
 
   function tryAgain() {
     drawn = null;
+    chosenIntent = null;
     busy = false;
     sharePrep = null;
     sharePrepPromise = null;
@@ -908,12 +943,18 @@
 
   /* ---------- wiring ---------- */
   var actions = {
-    'to-focus': function () {
+    'to-intention': function () {
+      show('intention');
+    },
+    'choose-intention': function (el) {
+      chosenIntent = (el && el.dataset.intent) || null;
+      announce('Intention set: ' + (chosenIntent || 'any') + '. Now focus your mind.');
       show('focus');
     },
     'advance-splash': advanceSplash,
     'begin-reveal': beginReveal,
     'reveal-fortune': revealFortune,
+    'to-result': goToResult,
     'enable-shake': enableShake,
     share: shareFortune,
     'save-image': saveImage,
@@ -927,7 +968,7 @@
     if (fn) {
       e.preventDefault();
       if (el.dataset.action !== 'reveal-fortune') haptic(10); // taps get a tick (Android)
-      fn();
+      fn(el);
     }
   });
 
@@ -970,6 +1011,11 @@
             app.appendChild(c);
           });
         }
+      });
+    } else if (devScreen === 'number') {
+      loadFortunes().then(function () {
+        pickFortune();
+        goToNumber();
       });
     } else {
       show(devScreen);

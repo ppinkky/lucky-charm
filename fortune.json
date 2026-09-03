@@ -16,6 +16,7 @@
         "luckyDish": "Golden Puff",
         "luckyDishNote": "Crisp outside, the good part hidden within.",
         "luckySign": null,
+        "intents": ["money", "luck", "work", "food"],
         "image": "/assets/fortunes/food/golden puff.svg"
       },
       {
@@ -30,6 +31,7 @@
         "luckyDish": "Gai Hor Bai Toey",
         "luckyDishNote": "Wrapped in pandan, worth the unwrapping.",
         "luckySign": null,
+        "intents": ["love", "luck", "food"],
         "image": "/assets/fortunes/food/chicken.svg"
       },
       {
@@ -44,6 +46,7 @@
         "luckyDish": "Thai Crepe Dumpling",
         "luckyDishNote": "Delicate work, made with a soft hand.",
         "luckySign": null,
+        "intents": ["love", "money", "food"],
         "image": "/assets/fortunes/food/thaidumpling.svg"
       },
       {
@@ -58,6 +61,7 @@
         "luckyDish": "Kapraw Gai Sub",
         "luckyDishNote": "Hot, direct, impossible to ignore.",
         "luckySign": null,
+        "intents": ["love", "money", "work", "food"],
         "image": "/assets/fortunes/food/kai krapow.svg"
       },
       {
@@ -72,6 +76,7 @@
         "luckyDish": "Pad Thai Bolan",
         "luckyDishNote": "The old recipe, still exactly right.",
         "luckySign": null,
+        "intents": ["love", "luck", "work", "food"],
         "image": "/assets/fortunes/food/padthai.svg"
       },
       {
@@ -86,6 +91,7 @@
         "luckyDish": "Pla Lad Preeg",
         "luckyDishNote": "Heat and contrast, familiar made new.",
         "luckySign": null,
+        "intents": ["love", "luck", "food"],
         "image": "/assets/fortunes/food/Pla lad prick.svg"
       },
       {
@@ -100,6 +106,7 @@
         "luckyDish": "Mieng Pla Pao",
         "luckyDishNote": "Many ingredients, one perfect bite.",
         "luckySign": null,
+        "intents": ["love", "money", "work", "food"],
         "image": "/assets/fortunes/food/meing pla.svg"
       },
       {
@@ -114,6 +121,7 @@
         "luckyDish": "Short Ribs Panang",
         "luckyDishNote": "Slow-cooked, better for the wait.",
         "luckySign": null,
+        "intents": ["money", "love", "work", "food"],
         "image": "/assets/fortunes/food/short ribs.svg"
       },
       {
@@ -128,6 +136,7 @@
         "luckyDish": "Chilean Sea Bass",
         "luckyDishNote": "It moves with the current, not against it.",
         "luckySign": null,
+        "intents": ["luck", "money", "work", "food"],
         "image": "/assets/fortunes/food/seabrass.svg"
       },
       {
@@ -142,6 +151,7 @@
         "luckyDish": "Mango Sticky Rice",
         "luckyDishNote": "No reason needed. Simply good.",
         "luckySign": null,
+        "intents": ["love", "luck", "food"],
         "image": "/assets/fortunes/food/Mango Sticky rice.svg"
       },
       {
@@ -155,6 +165,7 @@
         "workStudy": "An old idea may succeed with a new collaborator, context, or execution.",
         "luckyDish": null,
         "luckySign": "Something familiar appearing in an unexpected place.",
+        "intents": ["love", "money", "luck", "work"],
         "image": null
       },
       {
@@ -168,6 +179,7 @@
         "workStudy": "Finish, delegate, archive, or abandon something. Your next idea needs somewhere to land.",
         "luckyDish": null,
         "luckySign": "An unexpected ending that feels more relieving than sad.",
+        "intents": ["luck", "love", "money", "work"],
         "image": null
       }
     ]

@@ -386,6 +386,112 @@ button {
   color: var(--brown);
 }
 
+/* ---------- 1.5 · intention ---------- */
+.screen--intention {
+  background: var(--paper-2);
+}
+.intention-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(20px, 4vh, 34px);
+  padding: 28px 24px 34px;
+}
+.intention-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.intention-choices {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 1.6vh, 14px);
+  width: 100%;
+  max-width: var(--btn-w);
+}
+.intention-choice {
+  --accent: var(--olive);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  height: clamp(52px, 7.5vh, 60px);
+  padding: 0 44px;
+  border: 1px solid color-mix(in srgb, var(--accent) 60%, var(--olive));
+  border-radius: 60px;
+  background: color-mix(in srgb, var(--accent) 7%, var(--paper-2));
+  color: var(--headline);
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background 140ms ease,
+    border-color 140ms ease,
+    transform 140ms ease;
+}
+/* left accent dot — turns five identical pills into five characters */
+.intention-choice::before {
+  content: '';
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  width: 9px;
+  height: 9px;
+  margin-top: -4.5px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+.intention-choice[data-intent='love'] {
+  --accent: var(--rose);
+}
+.intention-choice[data-intent='money'] {
+  --accent: var(--olive);
+}
+.intention-choice[data-intent='luck'] {
+  --accent: var(--terracotta);
+}
+.intention-choice[data-intent='work'] {
+  --accent: #a99e91;
+}
+.intention-choice[data-intent='food'] {
+  --accent: var(--teal);
+}
+.intention-choice:hover {
+  background: color-mix(in srgb, var(--accent) 16%, var(--paper-2));
+  border-color: var(--accent);
+}
+.intention-choice:active {
+  transform: translateY(1px);
+  background: color-mix(in srgb, var(--accent) 24%, var(--paper-2));
+}
+.intention-choice:focus-visible {
+  outline: 2px solid var(--brown);
+  outline-offset: 3px;
+}
+.screen--intention.is-active .intention-choice {
+  animation: screen-in 380ms cubic-bezier(0.2, 0.6, 0.2, 1) both;
+}
+.screen--intention.is-active .intention-choice:nth-child(2) {
+  animation-delay: 60ms;
+}
+.screen--intention.is-active .intention-choice:nth-child(3) {
+  animation-delay: 120ms;
+}
+.screen--intention.is-active .intention-choice:nth-child(4) {
+  animation-delay: 180ms;
+}
+.screen--intention.is-active .intention-choice:nth-child(5) {
+  animation-delay: 240ms;
+}
+
 /* ---------- 2 · focus ---------- */
 .screen--focus {
   background: var(--paper-2);
@@ -788,6 +894,68 @@ button {
   100% {
     opacity: 0;
   }
+}
+
+/* ---------- 4.5 · fortune number ---------- */
+.screen--number {
+  background: var(--paper-2);
+}
+.number-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(28px, 6vh, 48px);
+  padding: 28px 24px 44px;
+}
+.number-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+.number-kicker {
+  font-size: 12px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.number-value {
+  font-weight: 300;
+  font-size: clamp(96px, 34vw, 152px);
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: var(--headline);
+}
+.screen--number.is-active .number-value {
+  animation: number-in 640ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@keyframes number-in {
+  from {
+    opacity: 0;
+    transform: scale(0.72);
+    filter: blur(7px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+}
+/* held hidden until the suspense beat is over (JS toggles .is-ready after ~1.2s) */
+.number-reveal {
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+  transition:
+    opacity 480ms ease,
+    transform 480ms ease;
+}
+.screen--number.is-ready .number-reveal {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
 }
 
 /* ---------- 5 · result ---------- */

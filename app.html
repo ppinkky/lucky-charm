@@ -71,7 +71,35 @@
             </p>
           </div>
 
-          <button class="btn btn--primary" type="button" data-action="to-focus">Reveal my fortune</button>
+          <button class="btn btn--primary" type="button" data-action="to-intention">Reveal my fortune</button>
+        </div>
+      </section>
+
+      <!-- 1.5 — Intention -->
+      <section
+        class="screen screen--intention"
+        id="screen-intention"
+        data-screen="intention"
+        aria-label="What are you hoping for?"
+        hidden
+      >
+        <div class="intention-body">
+          <div class="intention-head">
+            <span class="ornament" aria-hidden="true"><i class="ornament-rule"></i>&#10022;<i class="ornament-rule"></i></span>
+            <h1 class="screen-title">What are you hoping for?</h1>
+            <span class="orbs orbs--sm" aria-hidden="true">
+              <i class="orb orb--gold"></i><i class="orb orb--orange"></i><i class="orb orb--brown"></i>
+            </span>
+            <p class="screen-sub">Choose one. It shapes the fortune you draw.</p>
+          </div>
+
+          <div class="intention-choices" role="group" aria-label="Choose an intention">
+            <button class="intention-choice" type="button" data-action="choose-intention" data-intent="love"><span>Love</span></button>
+            <button class="intention-choice" type="button" data-action="choose-intention" data-intent="health"><span>Health</span></button>
+            <button class="intention-choice" type="button" data-action="choose-intention" data-intent="wealth"><span>Wealth</span></button>
+            <button class="intention-choice" type="button" data-action="choose-intention" data-intent="work"><span>Work</span></button>
+            <button class="intention-choice" type="button" data-action="choose-intention" data-intent="food"><span>Good Food!</span></button>
+          </div>
         </div>
       </section>
 
@@ -91,7 +119,7 @@
             <img class="bowl-line" src="asset/app/bowl-line.svg" alt="" width="236" height="165" />
 
             <p class="focus-copy">
-              Close your eyes. Think of a question about love, health, wealth, or work. When you are ready, continue.
+              Close your eyes. Think about what you what to know. When you are ready, continue.
             </p>
           </div>
 
@@ -141,6 +169,24 @@
             </span>
             <img class="charm-wordmark" src="asset/app/charm-wordmark.svg" alt="Food Luck Prosperity Charm" width="227" height="44" />
           </button>
+        </div>
+      </section>
+
+      <!-- 4.5 — Fortune number -->
+      <section
+        class="screen screen--number"
+        id="screen-number"
+        data-screen="number"
+        aria-label="Your fortune number"
+        hidden
+      >
+        <div class="number-body">
+          <div class="number-main">
+            <span class="ornament" aria-hidden="true"><i class="ornament-rule"></i>&#10022;<i class="ornament-rule"></i></span>
+            <p class="number-kicker">Your fortune</p>
+            <p class="number-value" id="number-value">00</p>
+          </div>
+          <button class="btn btn--primary number-reveal" type="button" data-action="to-result" disabled>Reveal</button>
         </div>
       </section>
 
