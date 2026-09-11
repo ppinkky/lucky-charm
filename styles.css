@@ -12,12 +12,15 @@
   --panel-2: #DCD8CF;    /* artists section */
   --blue: #9DB2B0;       /* inspiration section */
   --olive: #948439;      /* illustrations section */
-  --terracotta: #9E4A1B; /* eyebrows + display accents — AA 4.5 on paper, AA 3 on panels */
+  --terracotta: #d66622; /* eyebrows + display accents + button background */
+  --terracotta-ink: #201E1B; /* text on terracotta */
   --rose: #CDA9A2;       /* accents on --brown — AA 4.5 on brown */
   --marquee-x: #E9B487;  /* marquee separators on --brown */
+  --muted: #A89B8F;      /* muted/disabled states */
   --line: rgba(29, 29, 29, .2);
   --sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   --mono: 'DM Mono', ui-monospace, Menlo, monospace;
+  --btn-w: 357px;        /* button max-width */
 }
 
 * { box-sizing: border-box; }
@@ -45,6 +48,41 @@ p, h1, h2, h3 { margin: 0; }
   background: var(--panel);
 }
 .header-logo img { height: 50px ; width: auto; }
+
+/* ---------- buttons ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  max-width: var(--btn-w, 357px);
+  height: 52px;
+  padding: 0 20px;
+  margin-top: 20px;
+  border: 0;
+  border-radius: 60px;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  cursor: pointer;
+  font-family: inherit;
+}
+.btn--primary {
+  background: var(--terracotta);
+  color: var(--terracotta-ink, var(--cream));
+}.btn--primary:disabled {
+  background: var(--muted);
+  color: var(--cream);
+  cursor: not-allowed;
+}.btn:active {
+  transform: translateY(1px);
+}
+.btn:focus-visible {
+  outline: 2px solid var(--brown);
+  outline-offset: 3px;
+}
 
 /* ---------- hero ---------- */
 .hero {
