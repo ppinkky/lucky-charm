@@ -277,13 +277,15 @@
   var SPLASH1_MS = REDUCED ? 1100 : 2200;
   var SPLASH2_MS = REDUCED ? 1300 : 2800;
   var splashTimer = 0;
+  var splashDestination = 'opening';
 
-  function runSplash() {
+  function runSplash(destination) {
+    splashDestination = destination || 'opening';
     show('opening1');
     splashTimer = window.setTimeout(function () {
       show('opening2');
       splashTimer = window.setTimeout(function () {
-        show('opening');
+        show(splashDestination);
       }, SPLASH2_MS);
     }, SPLASH1_MS);
   }
@@ -293,10 +295,10 @@
     if (current === 'opening1') {
       show('opening2');
       splashTimer = window.setTimeout(function () {
-        show('opening');
+        show(splashDestination);
       }, SPLASH2_MS);
     } else if (current === 'opening2') {
-      show('opening');
+      show(splashDestination);
     }
   }
 
@@ -998,6 +1000,7 @@
   // Local-only deep link for design QA, e.g. ?screen=result — never active in production.
   // Add #share on the result screen to render the generated share image full-bleed.
   var devScreen = new URLSearchParams(window.location.search).get('screen');
+  var entry = new URLSearchParams(window.location.search).get('entry');
   if (isLocal && devScreen && screens[devScreen]) {
     if (devScreen === 'result') {
       loadFortunes().then(function () {
@@ -1021,6 +1024,6 @@
       show(devScreen);
     }
   } else {
-    runSplash(); // Opening 1 → Opening 2 → Opening
+    runSplash(entry === 'home' ? 'intention' : 'opening'); // Keep both splashes; homepage skips the welcome screen.
   }
 })();
