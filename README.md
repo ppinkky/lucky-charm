@@ -235,6 +235,17 @@ review. The important checks are tracked in
 * sharing and saving on supported and unsupported browsers;
 * production URL, QR code, NFC tag, and restaurant lighting conditions.
 
+## Deployment
+
+The repository is designed for static hosting. Publish the repository root
+with the HTML, CSS, JavaScript, JSON, and `asset/` directory preserved at the
+same relative paths. The [CNAME](./CNAME) file supplies the custom domain for
+the configured host.
+
+After deployment, test the actual production URL rather than only localhost:
+browser security policies, motion permission behavior, Web Share availability,
+font loading, and image paths can differ between environments.
+
 ## Credits
 
 Created by **Pinky Arunwattanamongkol** and **Fai Chittayasodhara** with
