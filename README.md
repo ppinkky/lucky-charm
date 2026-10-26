@@ -277,37 +277,6 @@ Then open:
 No dependency installation is required. The landing page loads Lenis and DM
 Mono from CDNs; the ritual itself has no runtime package dependency.
 
-## Manual verification checklist
-
-Before sharing a deployment, verify the experience on both a phone and a
-desktop browser:
-
-- [ ] The landing page loads all logos, photos, food illustrations, and the
-      shake-card demo.
-- [ ] The “Try your luck!” button opens `app.html`.
-- [ ] Splash screens auto-advance and can be skipped with a tap, Enter, or
-      Space.
-- [ ] Each intention produces a draw from the matching pool when one exists.
-- [ ] The “I'm ready” action loads the fortune data and reaches the shake screen.
-- [ ] The bowl reveals by shaking on a supported phone.
-- [ ] Tapping the bowl reveals the fortune without motion permission.
-- [ ] Motion permission denial does not block the tap path.
-- [ ] Reduced motion skips the long choreography without losing the result.
-- [ ] The result shows the number, title, categories, and lucky dish/sign when
-      present.
-- [ ] When Thai translations and controls are supplied, the Thai result view
-      changes language without changing the selected fortune.
-- [ ] Share works where the Web Share API supports files.
-- [ ] Download/open-image fallback works on desktop and iOS.
-- [ ] “Try again” starts a fresh attempt and clears the previous state.
-- [ ] Keyboard focus and live announcements remain understandable.
-- [ ] The layout is readable at 320px, 390px, 430px, 768px, and 1440px widths.
-- [ ] The production URL, QR code, NFC tag, and restaurant lighting conditions
-      are verified before launch.
-
-The completion criteria and launch checks are tracked in
-[docs/taskboard.md](./docs/taskboard.md).
-
 ## Deployment
 
 The repository is designed for static hosting. Publish the repository root
